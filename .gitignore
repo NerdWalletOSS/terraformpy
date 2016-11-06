@@ -1,0 +1,53 @@
+# vendored files that get fetched during setup
+src/indy/specs/build/vendored/*
+
+# build directories
+/build/
+/docs/_build/
+
+# compiled files
+*.o
+*.a
+*.so
+*.pyc
+
+# egg / dist info files
+.eggs/
+.cache/
+*.egg-info
+*.dist-info
+
+# vim swap files
+.*.sw[op]
+
+# Keystore files
+*.jks
+
+# Project files
+node_modules/*
+.idea/
+*.iml
+.project
+.pydevproject
+.ropeproject
+.settings
+.uwsgi-reload
+
+# Test output
+nosetests.xml
+src/.coverage
+src/cover
+.noseids
+
+# Misc
+.DS_Store
+*#
+*~
+
+# Testing
+dump.rdb
+
+# Celery
+celerybeat.pid
+celerybeat-schedule
+celerybeat-schedule.db
