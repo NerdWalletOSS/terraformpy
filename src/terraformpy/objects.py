@@ -29,17 +29,28 @@ class TFObject(object):
             compiled.update(klass.compile())
         return compiled
 
+    @property
+    def terraform_name(self):
+        raise NotImplementedError
+
+    def __getattr__(self, name):
+        return '${{{0}.{1}}}'.format(self.terraform_name, name)
+
 
 class NamedObject(TFObject):
-    def __init__(self, name, **kwargs):
-        self.name = name
-        self.values = kwargs
+    def __init__(self, _name, **kwargs):
+        self._name = _name
+        self._values = kwargs
+
+    @property
+    def terraform_name(self):
+        return self.__class__.__name__.lower()
 
     @classmethod
     def compile(cls):
         return dict(
             (klass.__name__.lower(), dict(
-                (instance.name, instance.values)
+                (instance._name, instance._values)
                 for instance in klass._instances
             ))
             for klass in cls.__subclasses__()
@@ -48,10 +59,14 @@ class NamedObject(TFObject):
 
 
 class TypedObject(TFObject):
-    def __init__(self, type, name, **kwargs):
-        self.type = type
-        self.name = name
-        self.values = kwargs
+    def __init__(self, _type, _name, **kwargs):
+        self._type = _type
+        self._name = _name
+        self._values = kwargs
+
+    @property
+    def terraform_name(self):
+        return '.'.join([self._type, self._name])
 
     @classmethod
     def compile(cls):
@@ -65,19 +80,24 @@ class TypedObject(TFObject):
 
             for instance in klass._instances:
                 try:
-                    compiled[klass_name][instance.type][instance.name] = instance.values
+                    compiled[klass_name][instance._type][instance._name] = instance._values
                 except KeyError:
-                    compiled[klass_name][instance.type] = {instance.name: instance.values}
+                    compiled[klass_name][instance._type] = {instance._name: instance._values}
 
         return compiled
 
 
 class Provider(NamedObject):
-    pass
+    def __getattr__(self, name):
+        raise RuntimeError("Providers do not provide any attribute outputs")
 
 
 class Variable(NamedObject):
-    pass
+    def __repr__(self):
+        return '${{var.{0}}}'.format(self._name)
+
+    def __getattr__(self, name):
+        raise RuntimeError("Variables do not provide any attribute outputs")
 
 
 class Output(NamedObject):
