@@ -7,6 +7,7 @@ import sys
 import click
 
 from terraformpy import compile
+logging.basicConfig()
 
 log = logging.getLogger(__name__)
 
