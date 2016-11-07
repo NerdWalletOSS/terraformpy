@@ -105,7 +105,9 @@ class Output(NamedObject):
 
 
 class Data(TypedObject):
-    pass
+    @property
+    def terraform_name(self):
+        return '.'.join(['data', super(Data, self).terraform_name])
 
 
 class Resource(TypedObject):
