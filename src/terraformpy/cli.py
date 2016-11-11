@@ -14,6 +14,12 @@ log = logging.getLogger(__name__)
 @click.command()
 @click.option('-D', '--debug', is_flag=True)
 def main(debug=False):
+    if debug:
+        level = logging.DEBUG
+    else:
+        level = logging.INFO
+    logging.basicConfig(level=level)
+
     to_process = [
         ent
         for ent in os.listdir(os.getcwd())
