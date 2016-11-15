@@ -3,10 +3,23 @@
 This module provides a set of classes that can be used to build Terraform configurations in a (mostly) declarative way,
 while also leveraging Python to add some functional aspects to automate some of the more repetitive aspects of HCL.
 """
+import collections
+import six
+
+
+def recursive_update(dest, source):
+    for key, val in six.iteritems(source):
+        if isinstance(val, collections.Mapping):
+            recurse = recursive_update(dest.get(key, {}), val)
+            dest[key] = recurse
+        else:
+            dest[key] = val
+    return dest
 
 
 class TFObject(object):
     _instances = None
+    tf_object_name = "TFObject"
 
     def __new__(cls, *args, **kwargs):
         # create the instance
@@ -31,10 +44,24 @@ class TFObject(object):
 
     @classmethod
     def compile(cls):
-        compiled = {}
-        for klass in cls.__subclasses__():
-            compiled.update(klass.compile())
-        return compiled
+        def recursive_compile(cls):
+            results = []
+            try:
+                for instance in cls._instances:
+                    output = instance.build()
+                    results.append(output)
+            except TypeError:
+                pass
+
+            for klass in cls.__subclasses__():
+                results += recursive_compile(klass)
+            return results
+        configs = recursive_compile(cls)
+
+        result = {}
+        for config in configs:
+            result = recursive_update(result, config)
+        return result
 
 
 class NamedObject(TFObject):
@@ -48,16 +75,13 @@ class NamedObject(TFObject):
         raise RuntimeError("%ss does not provide attribute interpolation through attribute access!" %
                            self.__class__.__name__)
 
-    @classmethod
-    def compile(cls):
-        return dict(
-            (klass.__name__.lower(), dict(
-                (instance._name, instance._values)
-                for instance in klass._instances
-            ))
-            for klass in cls.__subclasses__()
-            if klass._instances
-        )
+    def build(self):
+        result = {
+            self.tf_object_name: {
+                self._name: self._values
+            }
+        }
+        return result
 
 
 class TypedObject(TFObject):
@@ -86,27 +110,20 @@ class TypedObject(TFObject):
     def __getattr__(self, name):
         return '${{{0}.{1}}}'.format(self.terraform_name, name)
 
-    @classmethod
-    def compile(cls):
-        compiled = {}
-        for klass in cls.__subclasses__():
-            if not klass._instances:
-                continue
-
-            klass_name = klass.__name__.lower()
-            compiled[klass_name] = {}
-
-            for instance in klass._instances:
-                try:
-                    compiled[klass_name][instance._type][instance._name] = instance._values
-                except KeyError:
-                    compiled[klass_name][instance._type] = {instance._name: instance._values}
-
-        return compiled
+    def build(self):
+        result = {
+            self.tf_object_name: {
+                self._type: {
+                    self._name: self._values
+                }
+            }
+        }
+        return result
 
 
 class Provider(NamedObject):
     """Represents a Terraform provider configuration"""
+    tf_object_name = "provider"
 
 
 class Variable(NamedObject):
@@ -119,16 +136,21 @@ class Variable(NamedObject):
         var = Variable('my_var', default='foo')
         assert var == '${var.my_var}'
     """
+    tf_object_name = "variable"
+
     def __repr__(self):
         return '${{var.{0}}}'.format(self._name)
 
 
 class Output(NamedObject):
     """Represents a Terraform output"""
+    tf_object_name = "output"
 
 
 class Data(TypedObject):
     """Represents a Terraform data source"""
+    tf_object_name = "data"
+
     @property
     def terraform_name(self):
         return '.'.join(['data', super(Data, self).terraform_name])
@@ -136,3 +158,4 @@ class Data(TypedObject):
 
 class Resource(TypedObject):
     """Represents a Terraform resource"""
+    tf_object_name = "resource"
