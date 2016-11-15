@@ -1,9 +1,11 @@
 from setuptools import setup, find_packages
 
+with open('VERSION') as version_fd:
+    VERSION = version_fd.read().strip()
 
 setup(
     name='terraformpy',
-    version='0.0.1',
+    version=VERSION,
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
