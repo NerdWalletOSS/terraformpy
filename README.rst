@@ -1,8 +1,6 @@
 Terrafompy
 ==========
 
-**WIP -- Some of the things in this documentation may be aspirational and not implemented yet!**
-
 Terraform is an amazing tool.  Like, really amazing.  When working with code that is managing third-party service
 definitions, and actually applying changes to those definitions by invoking APIs, a high-degree of confidence in the
 change process is a must-have, and that's where Terraform excels.  The work flow it empowers allow teams to quickly make
@@ -22,9 +20,8 @@ we're pretty good at in Python!
 Terraformpy is a library and command line tool for building Terraform configs using Python.
 
 
-
-How it works
-------------
+Using the CLI tool
+------------------
 
 The ``terraformpy`` command line tool operates as a shim for the underlying ``terraform`` tool.  When invoked it will
 first find all ``*.tf.py`` files in the current directory, loading them using the `imp`_ module, generate a file named
@@ -53,17 +50,12 @@ do -- import things, connect to databases, etc.
 .. _imp: https://docs.python.org/3/library/imp.html
 
 
-Implementation details
-~~~~~~~~~~~~~~~~~~~~~~
+Writing ``.tf.py`` files
+------------------------
 
-The ``TFObject`` class provides a "registry" through a ``__new__`` method that records each instance created on a class
-specific attribute.  
-
-
-Example
--------
-
-Below is the first example from the `Terraform getting start guide`_.
+The ``terraformpy`` name space provides a number of classes that map directly to things you declare in normal ``.tf.``
+files.  To write your definitions simply import these classes and begin creating instances of them.  Below is the first
+example from the `Terraform getting start guide`_.
 
 .. _Terraform getting start guide: https://www.terraform.io/intro/getting-started/build.html#configuration
 
@@ -85,7 +77,42 @@ Below is the first example from the `Terraform getting start guide`_.
     )
 
 
+Things you can import from ``terraformpy``:
+
+* ``Provider``
+* ``Variable``
+* ``Data``
+* ``Resource``
+* ``Output``
+
 See the ``examples/`` dir for fully functional examples.
+
+
+Interpolation
+-------------
+
+So far, we've only used terraformpy anonymously, but the returned instances of the ``Data`` and ``Resource`` classes
+offer handy interpolation shortcuts.  For example, a common task is using the ``Data`` class to fetch remote data:
+
+.. code-block:: python
+
+    ami = Data(
+        'aws_ami', 'ecs_ami',
+        most_recent=True,
+        filter=[
+            dict(name='name', values=['\*amazon-ecs-optimized']),
+            dict(name='owner-alias', values=['amazon'])
+        ]
+    )
+
+    Resource(
+        'aws_instance', 'example',
+        ami=ami.id,
+        instance_type='m4.xlarge'
+    )
+
+Here we simply refer to the id attribute on the ami object when creating the ``aws_instance``.  During the compile phase
+it would be converted to the correct syntax: ``"${data.aws_ami.ecs_ami.id}"``.
 
 
 Modules
@@ -96,3 +123,13 @@ reusable blocks in your Terraform configs.
 
 With all the features of Python at your disposal building reusable units is straightforward without using the native
 modules from Terraform.
+
+
+Real-world use
+==============
+
+Create a new python project specifically to house your definitions and give you namespace you can use to define and
+import your reusable pieces.  Depend on terraformpy from your project.
+
+When proposing a change to the project use ``terraformpy plan -out=tf.plan`` (or similar) to generate a plan.  Apply the
+change in the generated plan and then commit the resulting state back to your project.
