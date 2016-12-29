@@ -1,37 +1,67 @@
-Terraform - Python Abstraction
-==============================
+Terrafompy
+==========
 
-This is a library and command line tool for building Terraform configs using Python.
+**WIP -- Some of the things in this documentation may be aspirational and not implemented yet!**
+
+Terraform is an amazing tool.  Like, really amazing.  When working with code that is managing third-party service
+definitions, and actually applying changes to those definitions by invoking APIs, a high-degree of confidence in the
+change process is a must-have, and that's where Terraform excels.  The work flow it empowers allow teams to quickly make
+changes across a large (and ever growing) footprint in multiple providers/regions/technologies/etc.
+
+But as your definitions grow the HCL syntax very quickly leaves a lot to be desired, and oh-my-gosh is it verbose... So
+many definitions of variables and outputs need to be repeated, over and over, as you compose more modules that use each
+other.  Also, since HCL is a language built at Hashicorp specifically for Terraform it has an immaturity about it that
+is just the fact of the matter about a young language.
+
+Nestled in the Terraform docs there is a `section on a JSON syntax`_.  Well... building JSON from code is something
+we're pretty good at in Python!
+
+.. _section on a JSON syntax: https://www.terraform.io/docs/configuration/syntax.html#json-syntax
+
+
+Terraformpy is a library and command line tool for building Terraform configs using Python.
+
+
 
 How it works
 ------------
 
+The ``terraformpy`` command line tool operates as a shim for the underlying ``terraform`` tool.  When invoked it will
+first find all ``*.tf.py`` files in the current directory, loading them using the `imp`_ module, generate a file named
+``main.tf.json``, and then invoke underlying tool.
+
 .. code-block:: bash
 
-    terraformpy > main.tf.json
+    # just replace terraform in your regular workflow
+    terraformpy plan -out=tf.plan
 
-It works by looking for ``*.tf.py`` files in the current directory and loading them using the `imp`_ module.  Each of
-these ``.tf.py`` files should import the objects from this library and then use them to build the Terraform config (see
-the examples).  As each object is declared it is registered and the command line tool then invokes a "compile" step that
-turns the definitions into `Terraform's JSON syntax`_.
+    # review changes...
 
-From here you can operate on the ``.tf.json`` files using the standard Terraform workflow.
+    # apply them!
+    # since we're going to operate on the generated plan here, we don't event need to use terraformpy anymore
+    terraform apply tf.plan
 
+    # unless you're a cowboy, then you could do
+    terraformpy apply
+
+
+Each of the ``*.tf.py`` files uses a declarative syntax, using objects imported from this library.  You don't need to
+define a main function, you just create instances of classes (anonymous or otherwise) in the root of the module (you're
+building regular Python code here).  Since you're in a full blown Python environment there is no limit on what you can
+do -- import things, connect to databases, etc.
 
 .. _imp: https://docs.python.org/3/library/imp.html
-.. _Terraform's JSON syntax: https://www.terraform.io/docs/configuration/syntax.html#json-syntax
 
 
-Goals
------
+Implementation details
+~~~~~~~~~~~~~~~~~~~~~~
 
-* Maintain as much of the declarative nature of Terraform configs as possible, given that we are explicitly adding
-  functional programming to the mix.
-* 
+The ``TFObject`` class provides a "registry" through a ``__new__`` method that records each instance created on a class
+specific attribute.  
 
 
-Usage
------
+Example
+-------
 
 Below is the first example from the `Terraform getting start guide`_.
 
@@ -59,7 +89,7 @@ See the ``examples/`` dir for fully functional examples.
 
 
 Modules
-^^^^^^^
+-------
 
 Modules have been explicitly excluded from this implementation because they aim to solve the same problem -- building
 reusable blocks in your Terraform configs.

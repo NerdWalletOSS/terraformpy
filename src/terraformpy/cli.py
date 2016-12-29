@@ -13,7 +13,9 @@ log = logging.getLogger(__name__)
 
 @click.command()
 @click.option('-D', '--debug', is_flag=True)
-def main(debug=False):
+@click.argument('terraform_args', nargs=-1, type=click.UNPROCESSED)
+def main(debug, terraform_args):
+    """Compile *.tf.py files and run Terraform"""
     if debug:
         level = logging.DEBUG
     else:
@@ -42,4 +44,8 @@ def main(debug=False):
         except AttributeError:
             pass
 
-    print json.dumps(compile(), indent=4, sort_keys=True)
+    with open('main.tf.json', 'w') as fd:
+        json.dump(compile(), fd, indent=4, sort_keys=True)
+
+    # replace ourself with terraform
+    os.execvp("terraform", terraform_args)
