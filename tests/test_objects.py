@@ -4,8 +4,12 @@ from terraformpy import TFObject, Data, Resource, Variable
 
 
 def test_object_instances():
-    obj1 = TFObject()
-    assert TFObject._instances == [obj1]
+    res = Resource('res1', 'foo', attr='value')
+    var = Variable('var1', default='foo')
+
+    assert TFObject._instances is None
+    assert Resource._instances == [res]
+    assert Variable._instances == [var]
 
 
 def test_named_object():
@@ -70,3 +74,22 @@ def test_getattr():
     assert '{0}'.format(var1) == '${var.var1}'
     with pytest.raises(RuntimeError):
         assert var1.id, 'nope!  vars do not have attrs!'
+
+
+def test_tf_type():
+    TFObject.reset()
+
+    class TestResource(Resource):
+        pass
+
+    TestResource('res1', 'foo', attr='value')
+
+    assert TFObject.compile() == {
+        'resource': {
+            'res1': {
+                'foo': {
+                    'attr': 'value',
+                }
+            }
+        }
+    }

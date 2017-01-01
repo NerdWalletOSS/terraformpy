@@ -8,6 +8,7 @@ import six
 
 
 def recursive_update(dest, source):
+    """Like dict.update, but recursive"""
     for key, val in six.iteritems(source):
         if isinstance(val, collections.Mapping):
             recurse = recursive_update(dest.get(key, {}), val)
@@ -19,11 +20,18 @@ def recursive_update(dest, source):
 
 class TFObject(object):
     _instances = None
-    tf_object_name = "TFObject"
+
+    # When recursively compiling, the "type" of object that is written out to the terraform definition needs to point to
+    # the top-most subclass of TFobject.  For example, if you create a subclass of Resource named MyResource any
+    # instances still needs to be written out to the json as "resource" and not "myresource".  This must be set to an
+    # appropriate value at each specific subclass that maps to a terraform resource type.
+    TF_TYPE = None
 
     def __new__(cls, *args, **kwargs):
         # create the instance
         inst = super(TFObject, cls).__new__(cls, *args, **kwargs)
+
+        assert inst.TF_TYPE is not None, "Bad programmer.  Set TF_TYPE on %s" % cls.__name__
 
         # register it on the class
         try:
@@ -77,7 +85,7 @@ class NamedObject(TFObject):
 
     def build(self):
         result = {
-            self.tf_object_name: {
+            self.TF_TYPE: {
                 self._name: self._values
             }
         }
@@ -112,7 +120,7 @@ class TypedObject(TFObject):
 
     def build(self):
         result = {
-            self.tf_object_name: {
+            self.TF_TYPE: {
                 self._type: {
                     self._name: self._values
                 }
@@ -123,7 +131,7 @@ class TypedObject(TFObject):
 
 class Provider(NamedObject):
     """Represents a Terraform provider configuration"""
-    tf_object_name = "provider"
+    TF_TYPE = "provider"
 
 
 class Variable(NamedObject):
@@ -136,7 +144,7 @@ class Variable(NamedObject):
         var = Variable('my_var', default='foo')
         assert var == '${var.my_var}'
     """
-    tf_object_name = "variable"
+    TF_TYPE = "variable"
 
     def __repr__(self):
         return '${{var.{0}}}'.format(self._name)
@@ -144,12 +152,12 @@ class Variable(NamedObject):
 
 class Output(NamedObject):
     """Represents a Terraform output"""
-    tf_object_name = "output"
+    TF_TYPE = "output"
 
 
 class Data(TypedObject):
     """Represents a Terraform data source"""
-    tf_object_name = "data"
+    TF_TYPE = "data"
 
     @property
     def terraform_name(self):
@@ -158,4 +166,4 @@ class Data(TypedObject):
 
 class Resource(TypedObject):
     """Represents a Terraform resource"""
-    tf_object_name = "resource"
+    TF_TYPE = "resource"
