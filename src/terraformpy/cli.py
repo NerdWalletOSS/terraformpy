@@ -48,4 +48,4 @@ def main(debug, terraform_args):
         json.dump(compile(), fd, indent=4, sort_keys=True)
 
     # replace ourself with terraform
-    os.execvp("terraform", terraform_args)
+    os.execvp("terraform", ["terraform"] + list(terraform_args))
