@@ -122,7 +122,85 @@ Modules have been explicitly excluded from this implementation because they aim 
 reusable blocks in your Terraform configs.
 
 With all the features of Python at your disposal building reusable units is straightforward without using the native
-modules from Terraform.
+modules from Terraform, but do see Resource Collections (next) for some helper scaffolding!
+
+
+Resource Collections
+--------------------
+
+A common pattern when building configs using Python is to want to abstract a number of different resources under the
+guise of a single object -- which is the same pattern native Terraform modules aim to solve.  In terraformpy we provide
+a ``ResourceCollection`` base class, and accompanying ``Input`` class, for building objects that represent multiple
+resources.
+
+As an example, when provisioning an RDS cluster you may want to have a standard set of options that you ship with all
+your clusters.  You can express that with a resource collection:
+
+.. code-block:: python
+
+    from terraformpy import Input, Resource, ResourceCollection
+
+
+    class RDSCluster(ResourceCollection):
+
+        # The inputs your define as class level attributes on your ResourceCollection become the signature of the
+        # __init__ function when creating an instance of this collection.  If you do not supply a default for the input
+        # (by providing it as the first parameter to input) then it is required and not supplying it would raise an
+        # MissingInput exception
+
+        name = Input()
+        azs = Input()
+        instance_class = Input()
+
+
+        # The create_resources function is invoked once the instance has been created and the kwargs provided have been
+        # processed against the inputs.  All of the instance attributes have been converted to the values provided, so
+        # if you access self.name in create_resources you're accessing whatever value was provided to the instance
+
+        def create_resources(self):
+            self.param_group = Resource(
+                'aws_rds_cluster_parameter_group', '{0}_pg'.format(self.name),
+                family='aurora5.6',
+                parameter=[
+                    {'name': 'character_set_server', 'value': 'utf8'},
+                    {'name': 'character_set_client', 'value': 'utf8'}
+                ]
+            )
+
+            self.cluster = Resource(
+                'aws_rds_cluster', self.name,
+                cluster_identifier=self.name,
+                availability_zones=self.azs,
+                database_name=self.name,
+                master_username='root',
+                master_password='password',
+                db_cluster_parameter_group_name=self.param_group.id
+            )
+
+            self.instances = Resource(
+                'aws_rds_cluster_instance', '{0}_instances'.format(self.name),
+                count=2,
+                identifier='{0}-${{count.index}}'.format(self.name),
+                cluster_identifier=self.cluster.id,
+                instance_class=self.instance_class
+            )
+
+
+That definition can then be imported and used in your terraformpy configs.
+
+.. code-block:: python
+
+    from modules.rds import RDSCluster
+
+
+    cluster1 = RDSCluster(
+        name='cluster1',
+        azs=['us-west-2a','us-west-2b','us-west-2c'],
+        instance_class='db.r3.large'
+    )
+
+    # you can then refer to the resources themselves, for interpolation, through the attrs
+    # i.e. cluster1.cluster.id
 
 
 Real-world use
