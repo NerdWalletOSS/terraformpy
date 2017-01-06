@@ -3,8 +3,12 @@ class MissingInput(Exception):
     """An input without a default was not supplied"""
 
 
+class InputDefault(object):
+    """This is used so that you can pass None as a default"""
+
+
 class Input(object):
-    def __init__(self, default=None):
+    def __init__(self, default=InputDefault):
         self.default = default
 
 
@@ -16,7 +20,7 @@ class ResourceCollection(object):
                 continue
 
             val = kwargs.get(name, attr.default)
-            if val is None:
+            if val == InputDefault:
                 raise MissingInput("You must supply '%s'" % name)
 
             setattr(self, name, val)

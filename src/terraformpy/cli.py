@@ -31,7 +31,7 @@ def main(debug, terraform_args):
         log.error("Error loading config: No Terraformpy (.tf.py) files found in %s", os.getcwd())
         sys.exit(1)
 
-    log.debug("terraformpy - processing: %s", to_process)
+    log.info("terraformpy - processing: %s", to_process)
 
     # all we need to do is import our files
     # the nature of resource declaration will register all of the objects for us to compile
