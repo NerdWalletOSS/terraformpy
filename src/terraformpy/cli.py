@@ -13,8 +13,9 @@ log = logging.getLogger(__name__)
 
 @click.command()
 @click.option('-D', '--debug', is_flag=True)
+@click.option('--dry-run', is_flag=True) #only compile the json file
 @click.argument('terraform_args', nargs=-1, type=click.UNPROCESSED)
-def main(debug, terraform_args):
+def main(debug, dry_run, terraform_args):
     """Compile *.tf.py files and run Terraform"""
     if debug:
         level = logging.DEBUG
@@ -46,6 +47,9 @@ def main(debug, terraform_args):
 
     with open('main.tf.json', 'w') as fd:
         json.dump(compile(), fd, indent=4, sort_keys=True)
+
+    if dry_run:
+        return 0
 
     # replace ourself with terraform
     os.execvp("terraform", ["terraform"] + list(terraform_args))
