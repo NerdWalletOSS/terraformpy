@@ -23,7 +23,7 @@ def main():
     # all we need to do is import our files
     # the nature of resource declaration will register all of the objects for us to compile
     for filename in to_process:
-        tfpy = imp.load_source(filename[:-6], filename)
+        imp.load_source(filename[:-6], filename)
 
     # now 'compile' everything that was registered, and write it out the tf.json file
     print("terraformpy - Writing main.tf.json")
