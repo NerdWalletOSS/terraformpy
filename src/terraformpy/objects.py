@@ -22,7 +22,6 @@ def recursive_update(dest, source):
 
 class TFObject(object):
     _instances = None
-    _frozen = False
 
     # When recursively compiling, the "type" of object that is written out to the terraform definition needs to point to
     # the top-most subclass of TFobject.  For example, if you create a subclass of Resource named MyResource any
@@ -52,7 +51,6 @@ class TFObject(object):
             for klass in cls.__subclasses__():
                 recursive_reset(klass)
         recursive_reset(cls)
-        TFObject._frozen = False
 
     @classmethod
     def compile(cls):
@@ -60,9 +58,6 @@ class TFObject(object):
         if ResourceCollection._instances:
             for collection in ResourceCollection._instances:
                 collection.finalize_resources()
-
-        # set ourselves as frozen
-        TFObject._frozen = True
 
         def recursive_compile(cls):
             results = []
@@ -128,9 +123,7 @@ class TypedObject(TFObject):
         return '.'.join([self._type, self._name])
 
     def __getattr__(self, name):
-        if TFObject._frozen:
-            return '${{{0}.{1}}}'.format(self.terraform_name, name)
-        return self._values.get(name)
+        return '${{{0}.{1}}}'.format(self.terraform_name, name)
 
     def build(self):
         result = {
