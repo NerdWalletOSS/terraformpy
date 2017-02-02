@@ -24,9 +24,9 @@ class ResourceCollection(object):
 
         # register it on the class
         try:
-            cls._instances.append(inst)
+            ResourceCollection._instances.append(inst)
         except AttributeError:
-            cls._instances = [inst]
+            ResourceCollection._instances = [inst]
 
         # return it
         return inst
