@@ -211,3 +211,23 @@ import your reusable pieces.  Depend on terraformpy from your project.
 
 When proposing a change to the project use ``terraformpy plan -out=tf.plan`` (or similar) to generate a plan.  Apply the
 change in the generated plan and then commit the resulting state back to your project.
+
+
+Notes and Gotchas
+-----------------
+
+Security Group Rules and ``self``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When creating ``aws_security_group_rule`` ``Resource`` objects you cannot pass ``self=True`` to the object since Python
+already passes a ``self`` argument into the constructor.  In this case you'll need to specify it directly in the
+``_values``:
+
+.. code-block:: python
+
+    sg = Resource(
+        'aws_security_group_rule', 'my_rule',
+        _values=dict(self=True),
+        vpc_id=vpc.id,
+        ...
+    )

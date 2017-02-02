@@ -81,9 +81,13 @@ class TFObject(object):
 
 class NamedObject(TFObject):
     """Named objects are the Terraform definitions that only have a single name component (i.e. variable or output)"""
-    def __init__(self, _name, **kwargs):
+    def __init__(self, _name, _values=None, **kwargs):
+        """When creating a TF Object you can supply _values if you want to directly influence the values of the object,
+        like when you're creating security group rules and need to specify `self`
+        """
         self._name = _name
-        self._values = kwargs
+        self._values = _values or {}
+        self._values.update(kwargs)
 
     def __getattr__(self, name):
         """This is here as a safety so that you cannot generate hard to debug .tf.json files"""
@@ -99,7 +103,7 @@ class NamedObject(TFObject):
         return result
 
 
-class TypedObject(TFObject):
+class TypedObject(NamedObject):
     """Represents a Terraform object that has both a type and name (i.e. resource or data).
 
     When you access an attribute of an instance of this class it will return the correct interpolation syntax for that
@@ -114,9 +118,8 @@ class TypedObject(TFObject):
     the interpolation syntax.
     """
     def __init__(self, _type, _name, **kwargs):
+        super(TypedObject, self).__init__(_name, **kwargs)
         self._type = _type
-        self._name = _name
-        self._values = kwargs
 
     @property
     def terraform_name(self):
