@@ -16,6 +16,21 @@ class Input(object):
 
 
 class ResourceCollection(object):
+    _instances = None
+
+    def __new__(cls, *args, **kwargs):
+        # create the instance
+        inst = super(ResourceCollection, cls).__new__(cls, *args, **kwargs)
+
+        # register it on the class
+        try:
+            ResourceCollection._instances.append(inst)
+        except AttributeError:
+            ResourceCollection._instances = [inst]
+
+        # return it
+        return inst
+
     def __init__(self, **kwargs):
         for name in dir(self):
             attr = getattr(self, name)
@@ -61,3 +76,9 @@ class ResourceCollection(object):
 
     def create_resources(self):
         raise NotImplementedError
+
+    def finalize_resources(self):
+        """This is called right before we compile everything.  It gives the collection a chance to generate any final
+        resources prior to the compilation occuring.
+        """
+        pass
