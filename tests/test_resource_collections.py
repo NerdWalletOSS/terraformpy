@@ -62,6 +62,7 @@ def test_multiple_variants():
             with Variant('bar'):
                 pass
 
+
 def test_schematics():
     class TestCollection(ResourceCollection):
         foo = schematics.types.StringType(required=True)

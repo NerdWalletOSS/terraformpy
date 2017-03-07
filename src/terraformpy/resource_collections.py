@@ -3,6 +3,7 @@ import os
 
 import schematics.types
 
+
 class MissingInput(Exception):
     """An input without a default was not supplied"""
 
