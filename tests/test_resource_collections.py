@@ -42,6 +42,9 @@ def test_variants():
             )
         )
 
+    tc = make_collection()
+    assert tc.bar == 'default bar!'
+
     with Variant('prod'):
         tc = make_collection()
         assert tc.bar == 'prod bar!'
