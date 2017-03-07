@@ -95,6 +95,9 @@ class NamedObject(TFObject):
 
     def __getattr__(self, name):
         """This is here as a safety so that you cannot generate hard to debug .tf.json files"""
+        if not TFObject._frozen and name in self._values:
+            return self._values[name]
+
         raise RuntimeError("%ss does not provide attribute interpolation through attribute access!" %
                            self.__class__.__name__)
 
