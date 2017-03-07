@@ -71,10 +71,12 @@ def test_schematics():
         def create_resources(self):
             pass
 
-    tc = TestCollection(foo='foo!', baz='bbq@lol.tld')
-
     with pytest.raises(schematics.exceptions.ValidationError):
         TestCollection(foo='foo!')
 
     with pytest.raises(schematics.exceptions.ValidationError):
         TestCollection(foo='foo!', baz='not an email')
+
+    tc = TestCollection(foo='foo!', baz='bbq@lol.tld')
+    assert tc.baz == 'bbq@lol.tld'
+    assert tc.foo == 'foo!'
