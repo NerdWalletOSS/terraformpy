@@ -37,7 +37,19 @@ class ResourceCollection(object):
             if not isinstance(attr, Input):
                 continue
 
-            val = kwargs.get(name, attr.default)
+            val = None
+
+            # if we have a variant we want to check it first
+            if Variant.CURRENT_VARIANT is not None:
+                # if there is then try fetching the val from inside the special variant attr
+                variant_name = '{0}_variant'.format(Variant.CURRENT_VARIANT.name)
+                variant_args = kwargs.get(variant_name, None)
+                if variant_args is not None:
+                    val = variant_args.get(name, None)
+
+            if val is None:
+                val = kwargs.get(name, attr.default)
+
             if val == InputDefault:
                 raise MissingInput("You must supply '%s'" % name)
 
@@ -82,3 +94,21 @@ class ResourceCollection(object):
         resources prior to the compilation occuring.
         """
         pass
+
+
+class Variant(object):
+    """When used as a context manager it provides the ability for ResourceCollection's to vary their inputs based on a
+    symbolc string name that allows you to define a resource collection for multiple environments where most of the
+    inputs are shared, with only a few differences
+    """
+    CURRENT_VARIANT = None
+
+    def __init__(self, name):
+        self.name = name
+
+    def __enter__(self):
+        assert Variant.CURRENT_VARIANT is None, "Only one variant may be active at a time"
+        Variant.CURRENT_VARIANT = self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        Variant.CURRENT_VARIANT = None
