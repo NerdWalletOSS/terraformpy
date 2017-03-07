@@ -48,7 +48,7 @@ class TFObject(object):
     @classmethod
     def reset(cls):
         def recursive_reset(cls):
-            cls._instances = None 
+            cls._instances = None
             for klass in cls.__subclasses__():
                 recursive_reset(klass)
         recursive_reset(cls)
@@ -97,7 +97,6 @@ class NamedObject(TFObject):
         """This is here as a safety so that you cannot generate hard to debug .tf.json files"""
         if not TFObject._frozen and name in self._values:
             return self._values[name]
-
         raise RuntimeError("%ss does not provide attribute interpolation through attribute access!" %
                            self.__class__.__name__)
 
