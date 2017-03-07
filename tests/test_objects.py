@@ -93,3 +93,14 @@ def test_tf_type():
             }
         }
     }
+
+
+def test_access_before_compile():
+    sg = Resource('aws_security_group', 'sg', ingress=['foo'])
+
+    assert sg.id == '${aws_security_group.sg.id}'
+    assert sg.ingress == ['foo']
+
+    TFObject._frozen = True
+
+    assert sg.ingress == '${aws_security_group.sg.ingress}'

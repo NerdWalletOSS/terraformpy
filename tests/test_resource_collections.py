@@ -16,8 +16,8 @@ def test_resource_collection():
 
     tc = TestCollection(foo='foo!')
     assert tc.foo == 'foo!'
-    assert tc.res1.foo == '${res1.foo.foo}'
-    assert tc.res1._values['foo'] == 'foo!'
+    assert tc.res1.foo == 'foo!'
+    assert tc.res1.id == '${res1.foo.id}'
 
     with pytest.raises(MissingInput):
         TestCollection()
