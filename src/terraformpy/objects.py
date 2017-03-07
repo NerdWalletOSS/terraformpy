@@ -22,6 +22,7 @@ def recursive_update(dest, source):
 
 class TFObject(object):
     _instances = None
+    _frozen = False
 
     # When recursively compiling, the "type" of object that is written out to the terraform definition needs to point to
     # the top-most subclass of TFobject.  For example, if you create a subclass of Resource named MyResource any
@@ -47,13 +48,16 @@ class TFObject(object):
     @classmethod
     def reset(cls):
         def recursive_reset(cls):
-            cls._instances = []
+            cls._instances = None
             for klass in cls.__subclasses__():
                 recursive_reset(klass)
         recursive_reset(cls)
+        TFObject._frozen = False
 
     @classmethod
     def compile(cls):
+        TFObject._frozen = True
+
         # allow resource collections to have a final hurrah before we compile
         if ResourceCollection._instances:
             for collection in ResourceCollection._instances:
@@ -91,6 +95,8 @@ class NamedObject(TFObject):
 
     def __getattr__(self, name):
         """This is here as a safety so that you cannot generate hard to debug .tf.json files"""
+        if not TFObject._frozen and name in self._values:
+            return self._values[name]
         raise RuntimeError("%ss does not provide attribute interpolation through attribute access!" %
                            self.__class__.__name__)
 
@@ -126,6 +132,8 @@ class TypedObject(NamedObject):
         return '.'.join([self._type, self._name])
 
     def __getattr__(self, name):
+        if not TFObject._frozen and name in self._values:
+            return self._values[name]
         return '${{{0}.{1}}}'.format(self.terraform_name, name)
 
     def build(self):
