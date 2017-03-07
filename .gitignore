@@ -25,6 +25,7 @@ src/indy/specs/build/vendored/*
 
 # Project files
 node_modules/*
+/.vscode/
 .idea/
 *.iml
 .project
