@@ -41,7 +41,7 @@ class ResourceCollection(object):
 
             # if we have a variant we want to check it first
             if Variant.CURRENT_VARIANT is not None:
-                # if there is then retry fetching the val from inside the special variant attr
+                # if there is then try fetching the val from inside the special variant attr
                 variant_name = '{0}_variant'.format(Variant.CURRENT_VARIANT.name)
                 variant_args = kwargs.get(variant_name, None)
                 if variant_args is not None:
