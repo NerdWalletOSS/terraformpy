@@ -1,6 +1,8 @@
 import inspect
 import os
 
+import schematics.types
+
 
 class MissingInput(Exception):
     """An input without a default was not supplied"""
@@ -34,7 +36,7 @@ class ResourceCollection(object):
     def __init__(self, **kwargs):
         for name in dir(self):
             attr = getattr(self, name)
-            if not isinstance(attr, Input):
+            if not isinstance(attr, (Input, schematics.types.BaseType)):
                 continue
 
             val = None
@@ -50,8 +52,16 @@ class ResourceCollection(object):
             if val is None:
                 val = kwargs.get(name, attr.default)
 
-            if val == InputDefault:
-                raise MissingInput("You must supply '%s'" % name)
+            if isinstance(attr, Input):
+                if val == InputDefault:
+                    raise MissingInput("You must supply '%s'" % name)
+
+            if isinstance(attr, schematics.types.BaseType):
+                if val is None and attr.required:
+                    raise schematics.exceptions.ValidationError("{0} is a required input".format(name))
+
+                attr.validate(val)
+                val = attr.to_native(val)
 
             setattr(self, name, val)
 

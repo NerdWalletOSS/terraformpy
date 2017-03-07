@@ -8,6 +8,9 @@ setup(
     version=VERSION,
     packages=find_packages('src'),
     package_dir={'': 'src'},
+    install_requires=[
+        'schematics==1.1.1'
+    ],
     entry_points={
         'console_scripts': [
             'terraformpy = terraformpy.cli:main',
