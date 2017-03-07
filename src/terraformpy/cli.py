@@ -4,6 +4,7 @@ import os
 import sys
 
 from terraformpy import compile
+logging.basicConfig()
 
 
 def main():
