@@ -1,4 +1,6 @@
 import pytest
+import schematics.types
+import schematics.exceptions
 
 from terraformpy.objects import Resource
 from terraformpy.resource_collections import ResourceCollection, Input, MissingInput, Variant
@@ -52,3 +54,27 @@ def test_variants():
     with Variant('stage'):
         tc = make_collection()
         assert tc.bar == 'stage bar!'
+
+
+def test_multiple_variants():
+    with Variant('foo'):
+        with pytest.raises(AssertionError):
+            with Variant('bar'):
+                pass
+
+def test_schematics():
+    class TestCollection(ResourceCollection):
+        foo = schematics.types.StringType(required=True)
+        bar = schematics.types.StringType()
+        baz = schematics.types.EmailType(required=True)
+
+        def create_resources(self):
+            pass
+
+    tc = TestCollection(foo='foo!', baz='bbq@lol.tld')
+
+    with pytest.raises(schematics.exceptions.ValidationError):
+        TestCollection(foo='foo!')
+
+    with pytest.raises(schematics.exceptions.ValidationError):
+        TestCollection(foo='foo!', baz='not an email')
