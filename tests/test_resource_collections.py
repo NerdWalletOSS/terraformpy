@@ -72,7 +72,7 @@ def test_schematics():
         def create_resources(self):
             pass
 
-    with pytest.raises(schematics.exceptions.ValidationError):
+    with pytest.raises(MissingInput):
         TestCollection(foo='foo!')
 
     with pytest.raises(schematics.exceptions.ValidationError):
@@ -81,3 +81,21 @@ def test_schematics():
     tc = TestCollection(foo='foo!', baz='bbq@lol.tld')
     assert tc.baz == 'bbq@lol.tld'
     assert tc.foo == 'foo!'
+
+
+def test_variant_defaults():
+    class TestCollection(ResourceCollection):
+        foo = Input()
+        bar = Input('default bar!')
+
+        def create_resources(self):
+            self.res1 = Resource('res1', 'foo', foo=self.foo)
+
+    with Variant('testing', foo='variant default foo!'):
+        tc = TestCollection()
+        assert tc.foo == 'variant default foo!'
+
+    with Variant('testing2', bar='variant default bar!'):
+        tc = TestCollection(foo='test foo!')
+        assert tc.foo == 'test foo!'
+        assert tc.bar == 'variant default bar!'

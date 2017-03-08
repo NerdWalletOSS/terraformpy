@@ -40,6 +40,7 @@ class ResourceCollection(object):
                 continue
 
             val = None
+            default = attr.default
 
             # if we have a variant we want to check it first
             if Variant.CURRENT_VARIANT is not None:
@@ -49,14 +50,18 @@ class ResourceCollection(object):
                 if variant_args is not None:
                     val = variant_args.get(name, None)
 
+                # capture the default value from the variant if it exists
+                # the variant default always trumps the field default
+                default = Variant.CURRENT_VARIANT.defaults.get(name, None)
+
             if val is None:
-                val = kwargs.get(name, attr.default)
+                val = kwargs.get(name, default)
 
             if isinstance(attr, Input):
                 if val == InputDefault:
-                    raise MissingInput("You must supply '%s'" % name)
+                    raise MissingInput("{0} is a required input".format(name))
 
-            if isinstance(attr, schematics.types.BaseType):
+            elif isinstance(attr, schematics.types.BaseType):
                 if val is None and attr.required:
                     raise schematics.exceptions.ValidationError("{0} is a required input".format(name))
 
@@ -109,12 +114,17 @@ class ResourceCollection(object):
 class Variant(object):
     """When used as a context manager it provides the ability for ResourceCollection's to vary their inputs based on a
     symbolc string name that allows you to define a resource collection for multiple environments where most of the
-    inputs are shared, with only a few differences
+    inputs are shared, with only a few differences.
+
+    Any kwargs passed to the constructor become defaults for non-variant inputs.  This allows you to supply inputs that
+    are shared between many different ResourceCollections at the variant level so you don't need to pass them over and
+    over again.
     """
     CURRENT_VARIANT = None
 
-    def __init__(self, name):
+    def __init__(self, name, **kwargs):
         self.name = name
+        self.defaults = kwargs
 
     def __enter__(self):
         assert Variant.CURRENT_VARIANT is None, "Only one variant may be active at a time"
