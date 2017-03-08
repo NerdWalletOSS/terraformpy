@@ -52,6 +52,7 @@ class ResourceCollection(object):
 
                 # capture the default value from the variant if it exists
                 # the variant default always trumps the field default
+                # if the variant doesn't have a default we fall back to the original default
                 default = Variant.CURRENT_VARIANT.defaults.get(name, default)
 
             if val is None:
