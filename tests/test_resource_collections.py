@@ -101,5 +101,11 @@ def test_variant_defaults():
         assert tc.bar == 'variant default bar!'
 
     with Variant('testing3'):
-        tc = TestCollection(foo='test foo!')
+        tc = TestCollection(
+            foo='test foo!',
+            testing3_variant=dict(
+                foo='testing3 foo!'
+            )
+        )
+        assert tc.foo == 'testing3 foo!'
         assert tc.bar == 'default bar!'
