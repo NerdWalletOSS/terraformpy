@@ -81,3 +81,31 @@ def test_schematics():
     tc = TestCollection(foo='foo!', baz='bbq@lol.tld')
     assert tc.baz == 'bbq@lol.tld'
     assert tc.foo == 'foo!'
+
+
+def test_variant_defaults():
+    class TestCollection(ResourceCollection):
+        foo = Input()
+        bar = Input('default bar!')
+
+        def create_resources(self):
+            self.res1 = Resource('res1', 'foo', foo=self.foo)
+
+    with Variant('testing', foo='variant default foo!'):
+        tc = TestCollection()
+        assert tc.foo == 'variant default foo!'
+
+    with Variant('testing2', bar='variant default bar!'):
+        tc = TestCollection(foo='test foo!')
+        assert tc.foo == 'test foo!'
+        assert tc.bar == 'variant default bar!'
+
+    with Variant('testing3'):
+        tc = TestCollection(
+            foo='test foo!',
+            testing3_variant=dict(
+                foo='testing3 foo!'
+            )
+        )
+        assert tc.foo == 'testing3 foo!'
+        assert tc.bar == 'default bar!'
