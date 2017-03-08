@@ -93,6 +93,12 @@ class NamedObject(TFObject):
         self._values = _values or {}
         self._values.update(kwargs)
 
+    def __setattr__(self, name, value):
+        if '_values' in self.__dict__ and name in self.__dict__['_values']:
+            self.__dict__['_values'][name] = value
+        else:
+            self.__dict__[name] = value
+
     def __getattr__(self, name):
         """This is here as a safety so that you cannot generate hard to debug .tf.json files"""
         if not TFObject._frozen and name in self._values:

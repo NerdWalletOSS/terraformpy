@@ -76,6 +76,17 @@ def test_getattr():
         assert var1.id, 'nope!  vars do not have attrs!'
 
 
+def test_setattr():
+    res1 = Resource('res1', 'foo', attr='value')
+
+    assert res1.attr == "value"
+    assert res1._values['attr'] == "value"
+
+    res1.not_tf_attr = "value"
+    assert res1.not_tf_attr == "value"
+    assert 'not_tf_attr' not in res1._values
+
+
 def test_tf_type():
     TFObject.reset()
 
