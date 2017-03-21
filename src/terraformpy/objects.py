@@ -114,6 +114,9 @@ class NamedObject(TFObject):
         }
         return result
 
+    def __repr__(self):
+        return "{0} {1}".format(type(self), self._name)
+
 
 class TypedObject(NamedObject):
     """Represents a Terraform object that has both a type and name (i.e. resource or data).
@@ -151,6 +154,9 @@ class TypedObject(NamedObject):
             }
         }
         return result
+
+    def __repr__(self):
+        return "{0} {1} {2}".format(type(self), self._type, self._name)
 
 
 class Provider(NamedObject):
