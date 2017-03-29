@@ -176,7 +176,6 @@ class TypedObject(NamedObject):
         return "{0} {1} {2}".format(type(self), self._type, self._name)
 
 
-
 class Provider(NamedObject):
     """Represents a Terraform provider configuration"""
     TF_TYPE = "provider"
