@@ -6,7 +6,7 @@ while also leveraging Python to add some functional aspects to automate some of 
 import collections
 import six
 
-from .resource_collections import ResourceCollection
+from .resource_collections import ResourceCollection, Variant
 
 
 def recursive_update(dest, source):
@@ -91,7 +91,15 @@ class NamedObject(TFObject):
         """
         self._name = _name
         self._values = _values or {}
-        self._values.update(kwargs)
+
+        if Variant.CURRENT_VARIANT is None:
+            self._values.update(kwargs)
+        else:
+            for name in kwargs:
+                if not name.endswith('_variant'):
+                    self._values[name] = kwargs[name]
+                elif name == '{0}_variant'.format(Variant.CURRENT_VARIANT.name):
+                    self._values.update(kwargs[name])
 
     def __setattr__(self, name, value):
         if '_values' in self.__dict__ and name in self.__dict__['_values']:

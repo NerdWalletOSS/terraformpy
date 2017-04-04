@@ -1,6 +1,6 @@
 import pytest
 
-from terraformpy import TFObject, Data, Resource, Variable
+from terraformpy import TFObject, Data, Resource, Variable, Variant
 
 
 def test_object_instances():
@@ -115,3 +115,14 @@ def test_access_before_compile():
     TFObject._frozen = True
 
     assert sg.ingress == '${aws_security_group.sg.ingress}'
+
+
+def test_object_variants():
+    with Variant('foo'):
+        sg = Resource(
+            'aws_security_group', 'sg',
+            foo_variant=dict(ingress=['foo']),
+            bar_variant=dict(ingress=['bar'])
+        )
+
+        assert sg.ingress == ['foo']
