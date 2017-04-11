@@ -20,6 +20,12 @@ def recursive_update(dest, source):
     return dest
 
 
+# Provider names are duplicate keys in the resulting json, so we need a way to represent that
+class DuplicateKey(str):
+    def __hash__(self):
+        return id(self)
+
+
 class TFObject(object):
     _instances = None
     _frozen = False
@@ -170,6 +176,15 @@ class TypedObject(NamedObject):
 class Provider(NamedObject):
     """Represents a Terraform provider configuration"""
     TF_TYPE = "provider"
+
+    # override build to support duplicate key values
+    def build(self):
+        result = {
+            self.TF_TYPE: {
+                DuplicateKey(self._name): self._values
+            }
+        }
+        return result
 
 
 class Variable(NamedObject):

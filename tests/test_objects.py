@@ -1,6 +1,7 @@
 import pytest
 
-from terraformpy import TFObject, Data, Resource, Variable, Variant
+import json
+from terraformpy import TFObject, Data, Resource, Variable, Variant, DuplicateKey, Provider
 
 
 def test_object_instances():
@@ -126,3 +127,23 @@ def test_object_variants():
         )
 
         assert sg.ingress == ['foo']
+
+
+def test_duplicate_key():
+    x = {DuplicateKey("mysql"): {"user": "wyatt"}, DuplicateKey("mysql"): {"user": "wyatt"}}
+    encoded = json.dumps(x, sort_keys=True)
+    desired = '{"mysql": {"user": "wyatt"}, "mysql": {"user": "wyatt"}}'
+    assert encoded == desired
+
+
+# Make sure provider supports duplicate key names
+def test_provider():
+    TFObject.reset()
+
+    Provider("mysql", host="db-wordpress")
+    Provider("mysql", host="db-finpro")
+
+    result = json.dumps(TFObject.compile(), sort_keys=True)
+    desired = '{"provider": {"mysql": {"host": "db-wordpress"}, "mysql": {"host": "db-finpro"}}}'
+
+    assert result == desired
