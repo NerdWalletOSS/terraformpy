@@ -206,7 +206,7 @@ class Variable(NamedObject):
         return '${{var.{0}}}'.format(self._name)
 
     def __str__(self):
-        return '${{var.{0}}}'.format(self._name)
+        return self.__repr__()
 
 
 class Output(NamedObject):
