@@ -173,7 +173,7 @@ class TypedObject(NamedObject):
         return "{0} {1} {2}".format(type(self), self._type, self._name)
 
     def __str__(self):
-        return "{0} {1} {2}".format(type(self), self._type, self._name)
+        return self.__repr__()
 
 
 class Provider(NamedObject):
