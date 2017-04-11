@@ -172,6 +172,9 @@ class TypedObject(NamedObject):
     def __repr__(self):
         return "{0} {1} {2}".format(type(self), self._type, self._name)
 
+    def __str__(self):
+        return self.__repr__()
+
 
 class Provider(NamedObject):
     """Represents a Terraform provider configuration"""
@@ -201,6 +204,9 @@ class Variable(NamedObject):
 
     def __repr__(self):
         return '${{var.{0}}}'.format(self._name)
+
+    def __str__(self):
+        return self.__repr__()
 
 
 class Output(NamedObject):
