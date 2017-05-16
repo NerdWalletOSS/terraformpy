@@ -109,3 +109,15 @@ def test_variant_defaults():
         )
         assert tc.foo == 'testing3 foo!'
         assert tc.bar == 'default bar!'
+
+
+def test_relative_file():
+    class TestCollection(ResourceCollection):
+        foo = Input()
+
+        def create_resources(self):
+            self.res1 = Resource('res1', 'foo', foo=self.foo)
+
+    tc = TestCollection(foo='foo!')
+
+    assert tc.relative_file('foo') == '${file("${path.module}/tests/foo")}'
