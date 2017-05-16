@@ -203,6 +203,31 @@ That definition can then be imported and used in your terraformpy configs.
     # i.e. cluster1.cluster.id
 
 
+Using file contents
+-------------------
+
+Often times you will want to include the contents of a file that is located alongside your Python code, but when
+running ``terraform`` along with the ``${file('myfile.json')}`` interpolation function pathing will be relative to
+where the compiled ``main.tf.json`` file is and not where the Python code lives.
+
+To help with this situation a function named ``relative_file`` inside of the ``terraformpy.helpers`` namespace is
+provided.
+
+.. code-block:: python
+
+    from terraformpy import Resource
+    from terraformpy.helpers import relative_file
+
+    Resource(
+        'aws_iam_role', 'role_name',
+        name='role-name',
+        assume_role_policy=relative_file('role_policy.json')
+    )
+
+This would produce a definition that leverages the ``${file(...)}`` interpolation function with a path that reads
+the ``role_policy.json`` file from the same directory as the Python code that defined the role.
+
+
 Real-world use
 ==============
 
