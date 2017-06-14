@@ -154,3 +154,6 @@ def test_interpolated():
 
     assert foo.name == 'sg'
     assert foo.interpolated('name') == '${aws_security_group.sg.name}'
+
+    # call .name again to ensure ._frozen is reset correctly and we can still mutate the original
+    assert foo.name == 'sg'
