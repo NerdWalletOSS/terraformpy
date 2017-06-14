@@ -3,38 +3,10 @@
 This module provides a set of classes that can be used to build Terraform configurations in a (mostly) declarative way,
 while also leveraging Python to add some functional aspects to automate some of the more repetitive aspects of HCL.
 """
-import copy
 import collections
 import six
 
 from .resource_collections import ResourceCollection, Variant
-
-
-def frozen_attr(attr):
-    """If you reference an attr on a TFObject that was provided as a value you will always get back the python object
-    instead of the Terraform interpolation string.  If you want the interpolation string this can be used to get it.
-
-    Example:
-
-    .. code-block:: python
-
-        role = Resource(
-            'aws_iam_role', 'my_role',
-            name='my-role',
-            ...
-        )
-        Resource(
-            'aws_iam_role_policy_attachment', 'role_attachment',
-            role=frozen_attr(role.name),
-            ...
-        )
-    """
-    try:
-        TFObject._frozen = True
-        val = copy.copy(attr)
-        return val
-    finally:
-        TFObject._frozen = False
 
 
 def recursive_update(dest, source):
@@ -181,6 +153,32 @@ class TypedObject(NamedObject):
     @property
     def terraform_name(self):
         return '.'.join([self._type, self._name])
+
+    def interpolated(self, name):
+        """If you reference an attr on a TFObject that was provided as a value you will always get back the python object
+        instead of the Terraform interpolation string.  If you want the interpolation string this can be used to get it.
+        If you don't do this then you can end up without the implicit dependency and can have failures due to ordering.
+
+        Example:
+
+        .. code-block:: python
+
+            role = Resource(
+                'aws_iam_role', 'my_role',
+                name='my-role',
+                ...
+            )
+            Resource(
+                'aws_iam_role_policy_attachment', 'role_attachment',
+                role=role.interpolated('name'),
+                ...
+            )
+        """
+        try:
+            TFObject._frozen = True
+            return getattr(self, name)
+        finally:
+            TFObject._frozen = False
 
     def __getattr__(self, name):
         if not TFObject._frozen and name in self._values:

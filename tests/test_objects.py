@@ -1,7 +1,7 @@
 import pytest
 
 import json
-from terraformpy import TFObject, Data, Resource, Variable, Variant, DuplicateKey, Provider, frozen_attr
+from terraformpy import TFObject, Data, Resource, Variable, Variant, DuplicateKey, Provider
 
 
 def test_object_instances():
@@ -149,8 +149,8 @@ def test_provider():
     assert result == desired
 
 
-def test_frozen_attr():
+def test_interpolated():
     foo = Resource('aws_security_group', 'sg', name='sg')
 
     assert foo.name == 'sg'
-    assert frozen_attr(foo.name) == '${aws_security_group.sg.name}'
+    assert foo.interpolated('name') == '${aws_security_group.sg.name}'
