@@ -147,3 +147,13 @@ def test_provider():
     desired = '{"provider": {"mysql": {"host": "db-wordpress"}, "mysql": {"host": "db-finpro"}}}'
 
     assert result == desired
+
+
+def test_interpolated():
+    foo = Resource('aws_security_group', 'sg', name='sg')
+
+    assert foo.name == 'sg'
+    assert foo.interpolated('name') == '${aws_security_group.sg.name}'
+
+    # call .name again to ensure ._frozen is reset correctly and we can still mutate the original
+    assert foo.name == 'sg'
