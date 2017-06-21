@@ -154,6 +154,32 @@ class TypedObject(NamedObject):
     def terraform_name(self):
         return '.'.join([self._type, self._name])
 
+    def interpolated(self, name):
+        """If you reference an attr on a TFObject that was provided as a value you will always get back the python object
+        instead of the Terraform interpolation string.  If you want the interpolation string this can be used to get it.
+        If you don't do this then you can end up without the implicit dependency and can have failures due to ordering.
+
+        Example:
+
+        .. code-block:: python
+
+            role = Resource(
+                'aws_iam_role', 'my_role',
+                name='my-role',
+                ...
+            )
+            Resource(
+                'aws_iam_role_policy_attachment', 'role_attachment',
+                role=role.interpolated('name'),
+                ...
+            )
+        """
+        try:
+            TFObject._frozen = True
+            return getattr(self, name)
+        finally:
+            TFObject._frozen = False
+
     def __getattr__(self, name):
         if not TFObject._frozen and name in self._values:
             return self._values[name]
