@@ -57,8 +57,8 @@ class ResourceCollection(object):
                 default = Variant.CURRENT_VARIANT.defaults.get(name, default)
 
             if val is not None and name in kwargs:
-                warn_msg = "The input {name} is specified in the variant {variant} AND the base ResourceCollection.".format(
-                    name=name, variant=Variant.CURRENT_VARIANT.name)
+                warn_msg = "The input {name} is specified in the variant {variant} AND the base ResourceCollection for collection type {collection}.".format(
+                    name=name, variant=Variant.CURRENT_VARIANT.name, collection=type(self))
                 warnings.warn(warn_msg)
 
             if val is None:
