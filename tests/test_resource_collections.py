@@ -57,10 +57,17 @@ def test_variants():
 
 
 def test_multiple_variants():
+    assert Variant.CURRENT_VARIANT is None
+
     with Variant('foo'):
-        with pytest.raises(AssertionError):
-            with Variant('bar'):
-                pass
+        assert Variant.CURRENT_VARIANT.name == 'foo'
+
+        with Variant('bar'):
+            assert Variant.CURRENT_VARIANT.name == 'bar'
+
+        assert Variant.CURRENT_VARIANT.name == 'foo'
+
+    assert Variant.CURRENT_VARIANT is None
 
 
 def test_schematics():

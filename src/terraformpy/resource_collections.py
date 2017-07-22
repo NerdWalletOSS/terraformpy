@@ -106,10 +106,11 @@ class Variant(object):
     def __init__(self, name, **kwargs):
         self.name = name
         self.defaults = kwargs
+        self.previous_variant = None
 
     def __enter__(self):
-        assert Variant.CURRENT_VARIANT is None, "Only one variant may be active at a time"
+        self.previous_variant = Variant.CURRENT_VARIANT
         Variant.CURRENT_VARIANT = self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        Variant.CURRENT_VARIANT = None
+        Variant.CURRENT_VARIANT = self.previous_variant
