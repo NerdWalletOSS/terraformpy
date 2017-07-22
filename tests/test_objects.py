@@ -134,9 +134,13 @@ def test_object_variants():
 
 def test_provider_context():
     with Provider("aws", region="us-east-1", alias="east1"):
-        sg = Resource('aws_security_group', 'sg', ingress=['foo'])
+        sg1 = Resource('aws_security_group', 'sg', ingress=['foo'])
 
-    assert sg.provider == 'aws.east1'
+        with Provider("aws", region="us-west-2", alias="west2"):
+            sg2 = Resource('aws_security_group', 'sg', ingress=['foo'])
+
+    assert sg1.provider == 'aws.east1'
+    assert sg2.provider == 'aws.west2'
 
 def test_duplicate_key():
     x = {DuplicateKey("mysql"): {"user": "wyatt"}, DuplicateKey("mysql"): {"user": "wyatt"}}
