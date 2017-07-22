@@ -173,3 +173,7 @@ def test_equality():
     d1 = Data('aws_security_group', 'sg', name='sg')
     assert r1 == r2
     assert r1 != d1
+
+    # Invalid comparisons
+    assert r1 != "string"
+    assert r1 != 0

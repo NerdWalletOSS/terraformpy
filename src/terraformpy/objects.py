@@ -121,7 +121,10 @@ class NamedObject(TFObject):
                            self.__class__.__name__)
 
     def __eq__(self, other):
-        return self._name == other._name and self._values == other._values
+        return isinstance(other, self.__class__) and self._name == other._name and self._values == other._values
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def build(self):
         result = {
@@ -154,7 +157,7 @@ class TypedObject(NamedObject):
         self._type = _type
 
     def __eq__(self, other):
-        return self._type == other._type and super(TypedObject, self).__eq__(other)
+        return super(TypedObject, self).__eq__(other) and self._type == other._type
 
     @property
     def terraform_name(self):
