@@ -203,6 +203,77 @@ That definition can then be imported and used in your terraformpy configs.
     # i.e. cluster1.cluster.id
 
 
+Variants
+--------
+
+Resource definitions that exist across many different environments often only vary slightly between each environment.
+To facilitate the ease of definition for these differences you can use variant grouping.
+
+First create the folders: ``configs/stage/``, ``configs/prod/``, ``configs/shared/``.  Inside each of them place a
+``__init__.py`` to make them packages.
+
+Next create the file ``configs/shared/instances.py``:
+
+.. code-block:: python
+
+    from terraformpy import Resource
+
+    Resource(
+        'aws_instance', 'example',
+        ami=ami.id,
+        prod_variant=dict(
+            instance_type='m4.xlarge'
+        ),
+        stage_variant=dict(
+            instance_type='t2.medium'
+        )
+    )
+
+Then create ``configs/stage/main.tf.py``:
+
+.. code-block:: python
+
+    from terraformpy import Variant
+
+    with Variant('stage'):
+        import configs.shared.instances
+
+Since the import of the instances file happens inside of the Variant context then the Resource will be created as if it
+had been defined like:
+
+.. code-block:: python
+
+    from terraformpy import Resource
+
+    Resource(
+        'aws_instance', 'example',
+        ami=ami.id,
+        instance_type='t2.medium'
+    )
+
+
+Multiple providers
+------------------
+
+Depending on your usage of Terraform you will likely end up needing to use multiple providers at some point in time.
+To use `multiple providers in Terraform`_ you define them using aliases and then reference those aliases in your
+resource definitions.
+
+To make this pattern easier you can use the Terraformpy ``Provider`` object as a context manager, and then any resources
+created within the context will automatically have that provider aliases referenced:
+
+.. code-block:: python
+
+    from terraformpy import Resource, Provider
+
+    with Provider("aws", region="us-west-2", alias="west2"):
+        sg = Resource('aws_security_group', 'sg', ingress=['foo'])
+
+    assert sg.provider == 'aws.west2'
+
+.. _multiple providers in Terraform: https://www.terraform.io/docs/configuration/providers.html#multiple-provider-instances
+
+
 Using file contents
 -------------------
 

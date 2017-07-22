@@ -107,6 +107,12 @@ class NamedObject(TFObject):
                 elif name == '{0}_variant'.format(Variant.CURRENT_VARIANT.name):
                     self._values.update(kwargs[name])
 
+        try:
+            self._values['provider'] = Provider.CURRENT_PROVIDER.as_provider()
+        except AttributeError:
+            # CURRENT_PROVIDER is None
+            pass
+
     def __setattr__(self, name, value):
         if '_values' in self.__dict__ and name in self.__dict__['_values']:
             self.__dict__['_values'][name] = value
@@ -212,8 +218,31 @@ class TypedObject(NamedObject):
 
 
 class Provider(NamedObject):
-    """Represents a Terraform provider configuration"""
+    """Represents a Terraform provider configuration.
+
+    Providers can be used as context managers, and then provide themselves to all objects created while the context is
+    active:
+
+    .. code-block:: python
+
+        with Provider("aws", region="us-west-2", alias="west2"):
+            sg = Resource('aws_security_group', 'sg', ingress=['foo'])
+
+        assert sg.provider == 'aws.west2'
+    """
     TF_TYPE = "provider"
+    CURRENT_PROVIDER = None
+
+    def __enter__(self):
+        assert self._values['alias'], "Providers must have an alias to be used as a context manager!"
+        self._previous_provider = Provider.CURRENT_PROVIDER
+        Provider.CURRENT_PROVIDER = self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        Provider.CURRENT_PROVIDER = self._previous_provider
+
+    def as_provider(self):
+        return '.'.join([self._name, self._values['alias']])
 
     # override build to support duplicate key values
     def build(self):

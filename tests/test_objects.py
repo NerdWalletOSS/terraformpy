@@ -119,7 +119,7 @@ def test_access_before_compile():
 
 
 def test_object_variants():
-    with Variant('foo'):
+    with Variant('foo', default='value'):
         sg = Resource(
             'aws_security_group', 'sg',
             foo_variant=dict(ingress=['foo']),
@@ -128,6 +128,15 @@ def test_object_variants():
 
         assert sg.ingress == ['foo']
 
+        # objects do not pickup defaults from variants
+        assert sg.default != 'value'
+
+
+def test_provider_context():
+    with Provider("aws", region="us-east-1", alias="east1"):
+        sg = Resource('aws_security_group', 'sg', ingress=['foo'])
+
+    assert sg.provider == 'aws.east1'
 
 def test_duplicate_key():
     x = {DuplicateKey("mysql"): {"user": "wyatt"}, DuplicateKey("mysql"): {"user": "wyatt"}}
