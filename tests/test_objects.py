@@ -142,6 +142,7 @@ def test_provider_context():
     assert sg1.provider == 'aws.east1'
     assert sg2.provider == 'aws.west2'
 
+
 def test_duplicate_key():
     x = {DuplicateKey("mysql"): {"user": "wyatt"}, DuplicateKey("mysql"): {"user": "wyatt"}}
     encoded = json.dumps(x, sort_keys=True)
