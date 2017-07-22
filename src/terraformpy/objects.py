@@ -120,6 +120,9 @@ class NamedObject(TFObject):
         raise RuntimeError("%ss does not provide attribute interpolation through attribute access!" %
                            self.__class__.__name__)
 
+    def __eq__(self, other):
+        return self._name == other._name and self._values == other._values
+
     def build(self):
         result = {
             self.TF_TYPE: {
@@ -149,6 +152,9 @@ class TypedObject(NamedObject):
     def __init__(self, _type, _name, **kwargs):
         super(TypedObject, self).__init__(_name, **kwargs)
         self._type = _type
+
+    def __eq__(self, other):
+        return self._type == other._type and super(TypedObject, self).__eq__(other)
 
     @property
     def terraform_name(self):

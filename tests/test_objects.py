@@ -157,3 +157,19 @@ def test_interpolated():
 
     # call .name again to ensure ._frozen is reset correctly and we can still mutate the original
     assert foo.name == 'sg'
+
+
+def test_equality():
+    # NamedObject
+    p1 = Provider("mysql", host="db")
+    p2 = Provider("mysql", host="db")
+    v1 = Variable("mysql", host="db")
+    assert p1 == p2
+    assert p1 != v1
+
+    # TypedObject
+    r1 = Resource('aws_security_group', 'sg', name='sg')
+    r2 = Resource('aws_security_group', 'sg', name='sg')
+    d1 = Data('aws_security_group', 'sg', name='sg')
+    assert r1 == r2
+    assert r1 != d1
