@@ -73,7 +73,7 @@ def test_getattr():
 
     var1 = Variable('var1', default='value')
     assert '{0}'.format(var1) == '${var.var1}'
-    with pytest.raises(RuntimeError):
+    with pytest.raises(AttributeError):
         assert var1.id, 'nope!  vars do not have attrs!'
 
 
@@ -136,11 +136,24 @@ def test_provider_context():
     with Provider("aws", region="us-east-1", alias="east1"):
         sg1 = Resource('aws_security_group', 'sg', ingress=['foo'])
 
+        # Since thing1 is not an aws_ resource it will not get the provider by default
+        thing1 = Resource('some_thing', 'foo', bar='baz')
+
+        # var1 is not a typedobject so it will not get a provider either
+        var1 = Variable('var1', default='foo')
+
         with Provider("aws", region="us-west-2", alias="west2"):
             sg2 = Resource('aws_security_group', 'sg', ingress=['foo'])
 
     assert sg1.provider == 'aws.east1'
     assert sg2.provider == 'aws.west2'
+
+    # thing1's provider is the default interpolation string
+    assert thing1.provider == '${some_thing.foo.provider}'
+
+    # var1 will raise a AttributeError
+    with pytest.raises(AttributeError):
+        assert var1.provider
 
 
 def test_duplicate_key():

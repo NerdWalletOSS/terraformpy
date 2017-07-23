@@ -107,12 +107,6 @@ class NamedObject(TFObject):
                 elif name == '{0}_variant'.format(Variant.CURRENT_VARIANT.name):
                     self._values.update(kwargs[name])
 
-        try:
-            self._values['provider'] = Provider.CURRENT_PROVIDER.as_provider()
-        except AttributeError:
-            # CURRENT_PROVIDER is None
-            pass
-
     def __setattr__(self, name, value):
         if '_values' in self.__dict__ and name in self.__dict__['_values']:
             self.__dict__['_values'][name] = value
@@ -123,8 +117,8 @@ class NamedObject(TFObject):
         """This is here as a safety so that you cannot generate hard to debug .tf.json files"""
         if not TFObject._frozen and name in self._values:
             return self._values[name]
-        raise RuntimeError("%ss does not provide attribute interpolation through attribute access!" %
-                           self.__class__.__name__)
+        raise AttributeError("%ss does not provide attribute interpolation through attribute access!" %
+                             self.__class__.__name__)
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self._name == other._name and self._values == other._values
@@ -161,6 +155,13 @@ class TypedObject(NamedObject):
     def __init__(self, _type, _name, **kwargs):
         super(TypedObject, self).__init__(_name, **kwargs)
         self._type = _type
+
+        try:
+            if Provider.CURRENT_PROVIDER._name == self._type.split('_')[0]:
+                self._values['provider'] = Provider.CURRENT_PROVIDER.as_provider()
+        except AttributeError:
+            # CURRENT_PROVIDER is None
+            pass
 
     def __eq__(self, other):
         return super(TypedObject, self).__eq__(other) and self._type == other._type
