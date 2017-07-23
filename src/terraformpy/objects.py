@@ -6,7 +6,7 @@ while also leveraging Python to add some functional aspects to automate some of 
 import collections
 import six
 
-from .resource_collections import ResourceCollection, Variant
+from .resource_collections import Variant
 
 
 def recursive_update(dest, source):
@@ -63,11 +63,6 @@ class TFObject(object):
     @classmethod
     def compile(cls):
         TFObject._frozen = True
-
-        # allow resource collections to have a final hurrah before we compile
-        if ResourceCollection._instances:
-            for collection in reversed(ResourceCollection._instances):
-                collection.finalize_resources()
 
         def recursive_compile(cls):
             results = []

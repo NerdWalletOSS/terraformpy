@@ -2,7 +2,7 @@ import pytest
 import schematics.types
 import schematics.exceptions
 
-from terraformpy.objects import Resource, TFObject
+from terraformpy.objects import Resource
 from terraformpy.resource_collections import ResourceCollection, Input, MissingInput, Variant
 
 
@@ -128,34 +128,3 @@ def test_relative_file():
     tc = TestCollection(foo='foo!')
 
     assert tc.relative_file('foo') == '${file("${path.module}/tests/foo")}'
-
-
-def test_finalize_ordering():
-    """Finalize should run in the reverse order that resource collections are created"""
-    class TC1(ResourceCollection):
-        def create_resources(self):
-            self.finalized = False
-            self.tc2 = None
-
-        def finalize_resources(self):
-            self.finalized = True
-            assert self.tc2 is not None
-
-    class TC2(ResourceCollection):
-        tc1 = Input()
-
-        def create_resources(self):
-            pass
-
-        def finalize_resources(self):
-            self.tc1.tc2 = self
-
-    tc1 = TC1()
-    tc2 = TC2(tc1=tc1)
-
-    assert not tc1.finalized
-
-    TFObject.compile()
-
-    assert tc1.finalized
-    assert tc1.tc2 == tc2

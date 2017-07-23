@@ -186,14 +186,6 @@ your clusters.  You can express that with a resource collection:
             )
 
 
-        # sometimes you need to create resources late, right before the Python objects are converted to JSON
-        # the finalize_resources method is called on all ResourceCollection instances, in the opposite order they were
-        # created in, right before compiling
-
-        def finalize_resources(self):
-            pass
-
-
 That definition can then be imported and used in your terraformpy configs.
 
 .. code-block:: python
