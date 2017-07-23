@@ -66,7 +66,7 @@ class TFObject(object):
 
         # allow resource collections to have a final hurrah before we compile
         if ResourceCollection._instances:
-            for collection in ResourceCollection._instances:
+            for collection in reversed(ResourceCollection._instances):
                 collection.finalize_resources()
 
         def recursive_compile(cls):
