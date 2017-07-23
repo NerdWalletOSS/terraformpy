@@ -6,7 +6,7 @@ while also leveraging Python to add some functional aspects to automate some of 
 import collections
 import six
 
-from .resource_collections import ResourceCollection, Variant
+from .resource_collections import Variant
 
 
 def recursive_update(dest, source):

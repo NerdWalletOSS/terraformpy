@@ -2,7 +2,7 @@ import pytest
 import schematics.types
 import schematics.exceptions
 
-from terraformpy.objects import Resource, TFObject
+from terraformpy.objects import Resource
 from terraformpy.resource_collections import ResourceCollection, Input, MissingInput, Variant
 
 
