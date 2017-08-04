@@ -1,5 +1,3 @@
-import warnings
-
 import schematics.types
 
 from terraformpy.helpers import relative_file as _relative_file
