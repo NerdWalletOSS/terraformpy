@@ -4,9 +4,13 @@ This module provides a set of classes that can be used to build Terraform config
 while also leveraging Python to add some functional aspects to automate some of the more repetitive aspects of HCL.
 """
 import collections
+import logging
+
 import six
 
 from .resource_collections import Variant
+
+log = logging.getLogger(__name__)
 
 
 def recursive_update(dest, source):
@@ -16,6 +20,9 @@ def recursive_update(dest, source):
             recurse = recursive_update(dest.get(key, {}), val)
             dest[key] = recurse
         else:
+            if key in dest:
+                # XXX TODO: how to get the full key here?
+                pass
             dest[key] = val
     return dest
 
