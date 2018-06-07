@@ -9,7 +9,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
-        'schematics>=2.0.1,<3.0'
+        'schematics>=1.1.1,<3.0'
     ],
     entry_points={
         'console_scripts': [
