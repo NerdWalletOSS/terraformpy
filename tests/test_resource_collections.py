@@ -5,6 +5,13 @@ import schematics.exceptions
 from terraformpy.objects import Resource
 from terraformpy.resource_collections import ResourceCollection, Input, MissingInput, Variant
 
+if hasattr(schematics.exceptions, 'ConversionError'):
+    # schematics 2+
+    SCHEMATICS_EXCEPTIONS = (schematics.exceptions.ValidationError, schematics.exceptions.ConversionError)
+else:
+    # schematics 1
+    SCHEMATICS_EXCEPTIONS = (schematics.exceptions.ValidationError,)
+
 
 def test_resource_collection():
     class TestCollection(ResourceCollection):
@@ -73,16 +80,16 @@ def test_multiple_variants():
 def test_schematics():
     class TestCollection(ResourceCollection):
         foo = schematics.types.StringType(required=True)
-        bar = schematics.types.StringType()
+        bar = schematics.types.StringType(default='')
         baz = schematics.types.EmailType(required=True)
 
         def create_resources(self):
             pass
 
-    with pytest.raises(schematics.exceptions.ValidationError):
+    with pytest.raises(SCHEMATICS_EXCEPTIONS):
         TestCollection(foo='foo!')
 
-    with pytest.raises(schematics.exceptions.ValidationError):
+    with pytest.raises(SCHEMATICS_EXCEPTIONS):
         TestCollection(foo='foo!', baz='not an email')
 
     tc = TestCollection(foo='foo!', baz='bbq@lol.tld')
