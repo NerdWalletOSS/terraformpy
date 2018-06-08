@@ -103,7 +103,7 @@ class NamedObject(TFObject):
         """When creating a TF Object you can supply _values if you want to directly influence the values of the object,
         like when you're creating security group rules and need to specify `self`
         """
-        assert self.TF_TYPE is not None, "Bad programmer.  Set TF_TYPE on %s" % cls.__name__
+        assert self.TF_TYPE is not None, "Bad programmer.  Set TF_TYPE on %s" % self.__class__.__name__
 
         self._name = _name
         self._values = _values or {}
