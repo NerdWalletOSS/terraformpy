@@ -250,10 +250,10 @@ class Provider(NamedObject):
         return result
 
 
-class Configuration(NamedObject):
-    """Represents Terraform configuration -- the terraform {} block in your config.
+class Terraform(NamedObject):
+    """Represents Terraform configuration.
 
-    https://www.terraform.io/docs/configuration/terraform.html
+    See: https://www.terraform.io/docs/configuration/terraform.html
     """
     TF_TYPE = "terraform"
 
