@@ -30,17 +30,9 @@ class TFObject(object):
     _instances = None
     _frozen = False
 
-    # When recursively compiling, the "type" of object that is written out to the terraform definition needs to point to
-    # the top-most subclass of TFobject.  For example, if you create a subclass of Resource named MyResource any
-    # instances still needs to be written out to the json as "resource" and not "myresource".  This must be set to an
-    # appropriate value at each specific subclass that maps to a terraform resource type.
-    TF_TYPE = None
-
     def __new__(cls, *args, **kwargs):
         # create the instance
         inst = super(TFObject, cls).__new__(cls, *args, **kwargs)
-
-        assert inst.TF_TYPE is not None, "Bad programmer.  Set TF_TYPE on %s" % cls.__name__
 
         # register it on the class
         try:
@@ -84,12 +76,35 @@ class TFObject(object):
         return result
 
 
+class Terraform(TFObject):
+    """Represents Terraform configuration.
+
+    See: https://www.terraform.io/docs/configuration/terraform.html
+    """
+    def __init__(self, _values=None, **kwargs):
+        self._values = _values or {}
+        self._values.update(kwargs)
+
+    def build(self):
+        return {
+            'terraform': self._values
+        }
+
+
 class NamedObject(TFObject):
     """Named objects are the Terraform definitions that only have a single name component (i.e. variable or output)"""
+    # When recursively compiling, the "type" of object that is written out to the terraform definition needs to point to
+    # the top-most subclass of TFobject.  For example, if you create a subclass of Resource named MyResource any
+    # instances still needs to be written out to the json as "resource" and not "myresource".  This must be set to an
+    # appropriate value at each specific subclass that maps to a terraform resource type.
+    TF_TYPE = None
+
     def __init__(self, _name, _values=None, **kwargs):
         """When creating a TF Object you can supply _values if you want to directly influence the values of the object,
         like when you're creating security group rules and need to specify `self`
         """
+        assert self.TF_TYPE is not None, "Bad programmer.  Set TF_TYPE on %s" % cls.__name__
+
         self._name = _name
         self._values = _values or {}
 
@@ -248,14 +263,6 @@ class Provider(NamedObject):
             }
         }
         return result
-
-
-class Terraform(NamedObject):
-    """Represents Terraform configuration.
-
-    See: https://www.terraform.io/docs/configuration/terraform.html
-    """
-    TF_TYPE = "terraform"
 
 
 class Variable(NamedObject):
