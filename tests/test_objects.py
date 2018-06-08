@@ -1,7 +1,7 @@
 import pytest
 
 import json
-from terraformpy import TFObject, Data, Resource, Variable, Variant, DuplicateKey, Provider
+from terraformpy import TFObject, Data, Resource, Variable, Variant, DuplicateKey, Provider, Terraform
 
 
 def test_object_instances():
@@ -204,3 +204,23 @@ def test_equality():
     # Invalid comparisons
     assert r1 != "string"
     assert r1 != 0
+
+
+def test_terraform_config():
+    tf = Terraform(
+        backend=dict(
+            s3=dict(
+                bucket='bucket'
+            )
+        )
+    )
+
+    assert tf.build() == {
+        'terraform': {
+            'backend': {
+                's3': {
+                    'bucket': 'bucket'
+                }
+            }
+        }
+    }
