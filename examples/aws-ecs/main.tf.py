@@ -8,7 +8,7 @@ In this example the VPC data we pull in from the remote state has 3 AZs/subnets 
 across.
 """
 
-from terraformpy import Provider, Data, Resource
+from terraformpy import Data, Provider, Resource
 
 # we build our launch configs based on the following data
 # each key should be an instance type and the value should be a tuple: (price, vCPUs)

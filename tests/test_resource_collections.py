@@ -1,9 +1,9 @@
 import pytest
-import schematics.types
 import schematics.exceptions
+import schematics.types
 
 from terraformpy.objects import Resource
-from terraformpy.resource_collections import ResourceCollection, Input, MissingInput, Variant
+from terraformpy.resource_collections import Input, MissingInput, ResourceCollection, Variant
 
 if hasattr(schematics.exceptions, 'ConversionError'):
     # schematics 2+

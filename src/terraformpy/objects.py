@@ -4,6 +4,7 @@ This module provides a set of classes that can be used to build Terraform config
 while also leveraging Python to add some functional aspects to automate some of the more repetitive aspects of HCL.
 """
 import collections
+
 import six
 
 from .resource_collections import Variant
@@ -81,6 +82,7 @@ class Terraform(TFObject):
 
     See: https://www.terraform.io/docs/configuration/terraform.html
     """
+
     def __init__(self, _values=None, **kwargs):
         self._values = _values or {}
         self._values.update(kwargs)
@@ -162,6 +164,7 @@ class TypedObject(NamedObject):
     This allows you to build up configurations using the instances of the objects as a shortcut to writing out all of
     the interpolation syntax.
     """
+
     def __init__(self, _type, _name, **kwargs):
         super(TypedObject, self).__init__(_name, **kwargs)
         self._type = _type
