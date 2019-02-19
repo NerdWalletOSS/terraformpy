@@ -66,6 +66,13 @@ class ResourceCollection(object):
                     raise schematics.exceptions.ValidationError("{0} is a required input".format(name))
 
                 attr.validate(val)
+
+                # support model level validation
+                validate_field = 'validate_{}'.format(name)
+                validator = getattr(self, validate_field, None)
+                if callable(validator):
+                    validator(kwargs, val)
+
                 val = attr.to_native(val)
 
             setattr(self, name, val)

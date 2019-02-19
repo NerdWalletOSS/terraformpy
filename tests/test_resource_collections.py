@@ -86,11 +86,18 @@ def test_schematics():
         def create_resources(self):
             pass
 
+        def validate_foo(self, data, value):
+            if not value.endswith('!'):
+                raise schematics.exceptions.ValidationError('foo must end in !')
+
     with pytest.raises(SCHEMATICS_EXCEPTIONS):
         TestCollection(foo='foo!')
 
     with pytest.raises(SCHEMATICS_EXCEPTIONS):
         TestCollection(foo='foo!', baz='not an email')
+
+    with pytest.raises(schematics.exceptions.ValidationError):
+        TestCollection(foo='no-exclaimation-mark', baz='baz@baz.com')
 
     tc = TestCollection(foo='foo!', baz='bbq@lol.tld')
     assert tc.baz == 'bbq@lol.tld'
