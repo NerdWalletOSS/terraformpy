@@ -1,9 +1,9 @@
 import pytest
-import schematics.types
 import schematics.exceptions
+import schematics.types
 
 from terraformpy.objects import Resource
-from terraformpy.resource_collections import ResourceCollection, Input, MissingInput, Variant
+from terraformpy.resource_collections import Input, MissingInput, ResourceCollection, Variant
 
 if hasattr(schematics.exceptions, 'ConversionError'):
     # schematics 2+
@@ -86,11 +86,18 @@ def test_schematics():
         def create_resources(self):
             pass
 
+        def validate_foo(self, data, value):
+            if not value.endswith('!'):
+                raise schematics.exceptions.ValidationError('foo must end in !')
+
     with pytest.raises(SCHEMATICS_EXCEPTIONS):
         TestCollection(foo='foo!')
 
     with pytest.raises(SCHEMATICS_EXCEPTIONS):
         TestCollection(foo='foo!', baz='not an email')
+
+    with pytest.raises(schematics.exceptions.ValidationError):
+        TestCollection(foo='no-exclaimation-mark', baz='baz@baz.com')
 
     tc = TestCollection(foo='foo!', baz='bbq@lol.tld')
     assert tc.baz == 'bbq@lol.tld'

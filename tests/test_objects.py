@@ -1,7 +1,8 @@
+import json
+
 import pytest
 
-import json
-from terraformpy import TFObject, Data, Resource, Variable, Variant, DuplicateKey, Provider, Terraform
+from terraformpy import Data, DuplicateKey, Provider, Resource, Terraform, TFObject, Variable, Variant
 
 
 def test_object_instances():
