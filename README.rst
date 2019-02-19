@@ -130,28 +130,32 @@ Resource Collections
 
 A common pattern when building configs using Python is to want to abstract a number of different resources under the
 guise of a single object -- which is the same pattern native Terraform modules aim to solve.  In terraformpy we provide
-a ``ResourceCollection`` base class, and accompanying ``Input`` class, for building objects that represent multiple
-resources.
+a ``ResourceCollection`` base class for building objects that represent multiple resources.
+
+You can use Schematics (https://schematics.readthedocs.io/en/latest/) to define the fields and perform validation.
 
 As an example, when provisioning an RDS cluster you may want to have a standard set of options that you ship with all
 your clusters.  You can express that with a resource collection:
 
 .. code-block:: python
 
-    from terraformpy import Input, Resource, ResourceCollection
+    from schematics import types
+    from schematics.types import compound
+    from terraformpy import Resource, ResourceCollection
 
 
     class RDSCluster(ResourceCollection):
 
-        # The inputs your define as class level attributes on your ResourceCollection become the signature of the
-        # __init__ function when creating an instance of this collection.  If you do not supply a default for the input
-        # (by providing it as the first parameter to input) then it is required and not supplying it would raise an
-        # MissingInput exception
+        # Defining attributes of your resource collection is like defining a Schematics model
+        # Each attribute becomes a field on the collection, and can be provided as a keyword when constructing
+        # an instance of your collection.
+        #
+        # Validation works the same as in Schematics.  You can attach validators to the fields themselves and
+        # also define "validate_field" functions.
 
-        name = Input()
-        azs = Input()
-        instance_class = Input()
-
+        name = types.StringType(required=True)
+        azs = compound.ListType(types.StringType, required=True)
+        instance_class = types.StringType(required=True, choices=('db.r3.large', ...))
 
         # The create_resources function is invoked once the instance has been created and the kwargs provided have been
         # processed against the inputs.  All of the instance attributes have been converted to the values provided, so
