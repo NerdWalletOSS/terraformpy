@@ -1,13 +1,17 @@
 import pytest
 import schematics.exceptions
-import schematics.types
+from schematics import types
 
 from terraformpy.objects import Resource
-from terraformpy.resource_collections import Input, MissingInput, ResourceCollection, Variant
+from terraformpy.resource_collections import ResourceCollection, Variant
 
 if hasattr(schematics.exceptions, 'ConversionError'):
     # schematics 2+
-    SCHEMATICS_EXCEPTIONS = (schematics.exceptions.ValidationError, schematics.exceptions.ConversionError)
+    SCHEMATICS_EXCEPTIONS = (
+        schematics.exceptions.ValidationError,
+        schematics.exceptions.ConversionError,
+        schematics.exceptions.DataError,
+    )
 else:
     # schematics 1
     SCHEMATICS_EXCEPTIONS = (schematics.exceptions.ValidationError,)
@@ -15,8 +19,8 @@ else:
 
 def test_resource_collection():
     class TestCollection(ResourceCollection):
-        foo = Input()
-        bar = Input(True)
+        foo = types.StringType(required=True)
+        bar = types.BooleanType(default=True)
 
         def create_resources(self):
             self.res1 = Resource('res1', 'foo', foo=self.foo)
@@ -26,14 +30,14 @@ def test_resource_collection():
     assert tc.res1.foo == 'foo!'
     assert tc.res1.id == '${res1.foo.id}'
 
-    with pytest.raises(MissingInput):
+    with pytest.raises(SCHEMATICS_EXCEPTIONS):
         TestCollection()
 
 
 def test_variants():
     class TestCollection(ResourceCollection):
-        foo = Input()
-        bar = Input('default bar!')
+        foo = types.StringType(required=True)
+        bar = types.StringType(default='default bar!')
 
         def create_resources(self):
             self.res1 = Resource('res1', 'foo', foo=self.foo)
@@ -79,9 +83,9 @@ def test_multiple_variants():
 
 def test_schematics():
     class TestCollection(ResourceCollection):
-        foo = schematics.types.StringType(required=True)
-        bar = schematics.types.StringType(default='')
-        baz = schematics.types.EmailType(required=True)
+        foo = types.StringType(required=True)
+        bar = types.StringType(default='')
+        baz = types.EmailType(required=True)
 
         def create_resources(self):
             pass
@@ -96,7 +100,7 @@ def test_schematics():
     with pytest.raises(SCHEMATICS_EXCEPTIONS):
         TestCollection(foo='foo!', baz='not an email')
 
-    with pytest.raises(schematics.exceptions.ValidationError):
+    with pytest.raises(SCHEMATICS_EXCEPTIONS):
         TestCollection(foo='no-exclaimation-mark', baz='baz@baz.com')
 
     tc = TestCollection(foo='foo!', baz='bbq@lol.tld')
@@ -106,8 +110,8 @@ def test_schematics():
 
 def test_variant_defaults():
     class TestCollection(ResourceCollection):
-        foo = Input()
-        bar = Input('default bar!')
+        foo = types.StringType(required=True)
+        bar = types.StringType(default='default bar!')
 
         def create_resources(self):
             self.res1 = Resource('res1', 'foo', foo=self.foo)
@@ -134,7 +138,7 @@ def test_variant_defaults():
 
 def test_relative_file():
     class TestCollection(ResourceCollection):
-        foo = Input()
+        foo = types.StringType(required=True)
 
         def create_resources(self):
             self.res1 = Resource('res1', 'foo', foo=self.foo)
