@@ -1,81 +1,56 @@
 import schematics.types
+import six
+from schematics.models import Model
 
 from terraformpy.helpers import relative_file as _relative_file
 
 
-class MissingInput(Exception):
-    """An input without a default was not supplied"""
+class ResourceCollection(Model):
+    """ResourceCollection is a specialized subclass of the schematics Model object that aims to keep the feel of the
+    TFObject while providing full compatibility as a schematics Model.
 
+    Unlike a model where you provide the data as a dict, you provide data as keyword args just like TFObject.
 
-class InputDefault(object):
-    """This is used so that you can pass None as a default"""
+    By default the Variant object is used to lookup variant properites, but you can also provide a variant_name argument
+    that will be used instead.
 
+    Variant data is defined inside of a `foo_variant` block.
 
-class Input(object):
-    def __init__(self, default=InputDefault):
-        self.default = default
+    .. code-block:: python
 
+        MyResourceColection(
+            count=2
+            prod_variant=dict(
+                count=4
+            )
+        )
 
-class ResourceCollection(object):
-    _instances = None
-
-    def __new__(cls, *args, **kwargs):
-        # create the instance
-        inst = super(ResourceCollection, cls).__new__(cls, *args, **kwargs)
-
-        # register it on the class
-        try:
-            ResourceCollection._instances.append(inst)
-        except AttributeError:
-            ResourceCollection._instances = [inst]
-
-        # return it
-        return inst
-
+    If the above block was defined within a `Variant('prod')` context then count would be 4, otherwise it would be 2.
+    """
     def __init__(self, **kwargs):
-        for name in dir(self):
-            attr = getattr(self, name)
-            if not isinstance(attr, (Input, schematics.types.BaseType)):
-                continue
+        variant_name = kwargs.pop('variant_name', None)
 
-            val = None
-            default = attr.default
+        if variant_name is None and Variant.CURRENT_VARIANT is not None:
+            variant_name = Variant.CURRENT_VARIANT.name
 
-            # if we have a variant we want to check it first
-            if Variant.CURRENT_VARIANT is not None:
-                # if there is then try fetching the val from inside the special variant attr
-                variant_name = '{0}_variant'.format(Variant.CURRENT_VARIANT.name)
-                variant_args = kwargs.get(variant_name, None)
-                if variant_args is not None:
-                    val = variant_args.get(name, None)
+            # update our raw data with the variant defaults
+            kwargs.update(Variant.CURRENT_VARIANT.defaults)
 
-                # capture the default value from the variant if it exists
-                # the variant default always trumps the field default
-                # if the variant doesn't have a default we fall back to the original default
-                default = Variant.CURRENT_VARIANT.defaults.get(name, default)
+        if variant_name is not None:
+            # if there is then try fetching the val from inside the special variant attr
+            variant_key = '{0}_variant'.format(Variant.CURRENT_VARIANT.name)
+            variant_data = kwargs.get(variant_key, None)
+            if variant_data is not None:
+                kwargs.update(variant_data)
 
-            if val is None:
-                val = kwargs.get(name, default)
+        # filter all of the variant data out
+        kwargs = dict(
+            (k, v)
+            for k, v in six.iteritems(kwargs)
+            if not k.endswith('_variant')
+        )
 
-            if isinstance(attr, Input):
-                if val == InputDefault:
-                    raise MissingInput("{0} is a required input".format(name))
-
-            elif isinstance(attr, schematics.types.BaseType):
-                if val is None and attr.required:
-                    raise schematics.exceptions.ValidationError("{0} is a required input".format(name))
-
-                attr.validate(val)
-
-                # support model level validation
-                validate_field = 'validate_{}'.format(name)
-                validator = getattr(self, validate_field, None)
-                if callable(validator):
-                    validator(kwargs, val)
-
-                val = attr.to_native(val)
-
-            setattr(self, name, val)
+        super(ResourceCollection, self).__init__(kwargs, validate=True)
 
         self.create_resources()
 
