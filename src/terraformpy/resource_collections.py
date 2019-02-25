@@ -1,4 +1,3 @@
-import schematics.types
 import six
 from schematics.models import Model
 
