@@ -1,3 +1,7 @@
+# 1.0.1
+
+* Add support for map indices access: https://www.terraform.io/docs/configuration/expressions.html#indices-and-attributes
+
 # 1.0.0
 
 * **BREAKING** - The `Input()` primitive originally shipped with terraformpy is now fully deprecated.

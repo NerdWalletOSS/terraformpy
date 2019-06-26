@@ -26,6 +26,7 @@ class ResourceCollection(Model):
 
     If the above block was defined within a `Variant('prod')` context then count would be 4, otherwise it would be 2.
     """
+
     def __init__(self, **kwargs):
         variant_name = kwargs.pop('variant_name', None)
 

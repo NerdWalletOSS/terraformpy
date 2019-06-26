@@ -157,6 +157,7 @@ class TypedObjectAttr(object):
     The main use case for needing an attr wrapper is accessing interpolated map values, such as those from the
     aws_kms_secrets resource.
     """
+
     def __init__(self, terraform_name, name):
         self.terraform_name = terraform_name
         self.name = name
