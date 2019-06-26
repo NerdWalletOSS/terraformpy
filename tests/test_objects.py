@@ -225,3 +225,17 @@ def test_terraform_config():
             }
         }
     }
+
+
+def test_attr_map_access():
+    secrets = Data(
+        "aws_kms_secrets", "test",
+        secret=[
+            {
+                "name": "foo",
+                "payload": "bar",
+            },
+        ]
+    )
+
+    assert secrets.plaintext["foo"] == '${data.aws_kms_secrets.test.plaintext["foo"]}'

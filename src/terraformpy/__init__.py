@@ -1,5 +1,5 @@
+from .objects import Data, DuplicateKey, Output, Provider, Resource, Terraform, TFObject, Variable  # noqa
 from .resource_collections import ResourceCollection, Variant  # noqa
-from .objects import TFObject, Provider, Variable, Data, Resource, Output, DuplicateKey, Terraform  # noqa
 
 # add a couple shortcuts
 compile = TFObject.compile
