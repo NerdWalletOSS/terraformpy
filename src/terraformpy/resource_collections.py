@@ -27,8 +27,15 @@ class ResourceCollection(Model):
     If the above block was defined within a `Variant('prod')` context then count would be 4, otherwise it would be 2.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         variant_name = kwargs.pop('variant_name', None)
+
+        # if we have positional arguments AND a context then we just want to do the schematics model thing and have
+        # super up to the model to let things happen.  this is most likely happening because one resource collection
+        # is being used as a reference in a modeltype
+        if len(args) > 0 and kwargs.get('context') is not None:
+            super(ResourceCollection, self).__init__(*args, **kwargs)
+            return
 
         if variant_name is None and Variant.CURRENT_VARIANT is not None:
             variant_name = Variant.CURRENT_VARIANT.name
