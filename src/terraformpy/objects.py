@@ -150,29 +150,24 @@ class NamedObject(TFObject):
         return "{0} {1}".format(type(self), self._name)
 
 
-@six.python_2_unicode_compatible
-class TypedObjectAttr(object):
+class TypedObjectAttr(str):
     """TypedObjectAttr is a wrapper returned by TypedObject for attributes accessed which don't exist.
 
     The main use case for needing an attr wrapper is accessing interpolated map values, such as those from the
     aws_kms_secrets resource.
     """
 
-    def __init__(self, terraform_name, name):
-        self.terraform_name = terraform_name
-        self.name = name
-
-    def __repr__(self):
-        return str(self)
-
-    def __str__(self):
-        return '${{{0}.{1}}}'.format(self.terraform_name, self.name)
-
-    def __eq__(self, other):
-        return str(self) == other
+    def __new__(cls, terraform_name, name):
+        obj = super(TypedObjectAttr, cls).__new__(cls, '${{{0}.{1}}}'.format(
+            terraform_name,
+            name
+        ))
+        obj._terraform_name = terraform_name
+        obj._name = name
+        return obj
 
     def __getitem__(self, item):
-        return '${{{0}.{1}["{2}"]}}'.format(self.terraform_name, self.name, item)
+        return '${{{0}.{1}["{2}"]}}'.format(self._terraform_name, self._name, item)
 
 
 class TypedObject(NamedObject):

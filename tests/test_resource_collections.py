@@ -2,7 +2,7 @@ import pytest
 import schematics.exceptions
 from schematics import types
 
-from terraformpy.objects import Resource
+from terraformpy.objects import Data, Resource
 from terraformpy.resource_collections import ResourceCollection, Variant
 
 if hasattr(schematics.exceptions, 'ConversionError'):
@@ -146,3 +146,18 @@ def test_relative_file():
     tc = TestCollection(foo='foo!')
 
     assert tc.relative_file('foo') == '${file("${path.module}/tests/foo")}'
+
+
+def test_typed_attr_as_strings():
+    class TestCollection(ResourceCollection):
+        foo = types.StringType(required=True)
+        bar = types.StringType(required=True)
+
+        def create_resources(self):
+            pass
+
+    data = Data('data_type', 'data_id')
+
+    tc = TestCollection(foo=data.baz, bar=data.baz["bbq"])
+    assert tc.foo == '${data.data_type.data_id.baz}'
+    assert tc.bar == '${data.data_type.data_id.baz["bbq"]}'
