@@ -1,3 +1,7 @@
+# 1.0.2
+
+Ensure the TypedObjecAttr class, added in 1.0.1, works as StringType inputs in ResourceCollection
+
 # 1.0.1
 
 * Add support for map indices access: https://www.terraform.io/docs/configuration/expressions.html#indices-and-attributes
