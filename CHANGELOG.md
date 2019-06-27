@@ -1,3 +1,7 @@
+# 1.0.3
+
+Allow ResourceCollection to be used in ModelType fields
+
 # 1.0.2
 
 Ensure the TypedObjecAttr class, added in 1.0.1, works as StringType inputs in ResourceCollection

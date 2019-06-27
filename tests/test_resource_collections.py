@@ -1,6 +1,7 @@
 import pytest
 import schematics.exceptions
 from schematics import types
+from schematics.types import compound
 
 from terraformpy.objects import Data, Resource
 from terraformpy.resource_collections import ResourceCollection, Variant
@@ -161,3 +162,22 @@ def test_typed_attr_as_strings():
     tc = TestCollection(foo=data.baz, bar=data.baz["bbq"])
     assert tc.foo == '${data.data_type.data_id.baz}'
     assert tc.bar == '${data.data_type.data_id.baz["bbq"]}'
+
+
+def test_model_type():
+    class C1(ResourceCollection):
+        foo = types.StringType(required=True)
+
+        def create_resources(self):
+            pass
+
+    class C2(ResourceCollection):
+        c1 = compound.ModelType(C1, required=True)
+
+        def create_resources(self):
+            pass
+
+    c1 = C1(foo='foo')
+    c2 = C2(c1=c1)
+
+    assert c2.c1.foo == 'foo'
