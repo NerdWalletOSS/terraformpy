@@ -1,3 +1,7 @@
+# 1.0.4
+
+Ensure DuplicateKey hash is monotonically increasing for stablesorting purposes
+
 # 1.0.3
 
 Allow ResourceCollection to be used in ModelType fields
