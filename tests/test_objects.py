@@ -158,9 +158,13 @@ def test_provider_context():
 
 
 def test_duplicate_key():
-    x = {DuplicateKey("mysql"): {"user": "wyatt"}, DuplicateKey("mysql"): {"user": "wyatt"}}
+    # ordering should ensure it's always <firstCreatedKey>, <secondCreatedKey>
+    # so let's ensure that works, even if say the value names are backwards-sorted
+    key2 = DuplicateKey("mysql")
+    key1 = DuplicateKey("mysql")
+    x = {key1 : {"user": "wyatt1"}, key2: {"user": "wyatt2"}}
     encoded = json.dumps(x, sort_keys=True)
-    desired = '{"mysql": {"user": "wyatt"}, "mysql": {"user": "wyatt"}}'
+    desired = '{"mysql": {"user": "wyatt2"}, "mysql": {"user": "wyatt1"}}'
     assert encoded == desired
 
 
