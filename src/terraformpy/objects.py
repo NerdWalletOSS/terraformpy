@@ -23,8 +23,17 @@ def recursive_update(dest, source):
 
 # Provider names are duplicate keys in the resulting json, so we need a way to represent that
 class DuplicateKey(str):
+    # Preserving usage order will help plan output remain consistent across invocations
+    next_hash_per_str = collections.defaultdict(lambda: 0)
+
+    def __init__(self, key=''):
+        super(DuplicateKey, self).__init__(key)
+
+        self.hash = DuplicateKey.next_hash_per_str[key]
+        DuplicateKey.next_hash_per_str[key] = self.hash + 1
+
     def __hash__(self):
-        return id(self)
+        return self.hash
 
 
 class TFObject(object):
