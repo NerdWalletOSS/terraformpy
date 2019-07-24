@@ -1,3 +1,7 @@
+# 1.0.5
+
+Added OrderedDictionary schema type
+
 # 1.0.4
 
 Ensure DuplicateKey hash is monotonically increasing for stablesorting purposes
