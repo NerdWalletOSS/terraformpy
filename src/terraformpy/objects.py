@@ -6,6 +6,7 @@ while also leveraging Python to add some functional aspects to automate some of 
 import collections
 
 import six
+from schematics.types import compound
 
 from .resource_collections import Variant
 
@@ -34,6 +35,34 @@ class DuplicateKey(str):
 
     def __hash__(self):
         return self.hash
+
+
+class OrderedDict(compound.DictType):
+    """
+    A schematic DictType that preserves key insertion order
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(OrderedDict, self).__init__(*args, **kwargs)
+        self.native_type = collections.OrderedDict
+
+    def convert(self, value, context=None):
+        # okay, this is a little wasteful for the purpose of not having to
+        # copy-paste the implementation that might currently exist
+        # in compound.DictType
+        # so sure, we iterate over the type a couple of times, but this way
+        # we get their validators and updates to their validators
+        temp_data = super(OrderedDict, self).convert(value, context)
+
+        # so now, temp_data is a dict filled with the correct (and coerced)
+        # values, we just want it to be ordered now based on how `value`
+        # was passed in
+        # let's trust the validators in `convert()` and not check key existance
+        data = collections.OrderedDict()
+        for k in value.keys():
+            data[k] = temp_data[k]
+
+        return data
 
 
 class TFObject(object):

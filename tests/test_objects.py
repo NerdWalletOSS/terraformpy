@@ -1,8 +1,10 @@
+import collections
 import json
 
 import pytest
+import schematics.types
 
-from terraformpy import Data, DuplicateKey, Provider, Resource, Terraform, TFObject, Variable, Variant
+from terraformpy import Data, DuplicateKey, OrderedDict, Provider, Resource, Terraform, TFObject, Variable, Variant
 
 
 def test_object_instances():
@@ -165,6 +167,17 @@ def test_duplicate_key():
     encoded = json.dumps({key1: {"user": "wyatt1"}, key2: {"user": "wyatt2"}}, sort_keys=True)
     desired = '{"mysql": {"user": "wyatt2"}, "mysql": {"user": "wyatt1"}}'
     assert encoded == desired
+
+
+def test_ordered_dict():
+    typ = OrderedDict(schematics.types.IntType)
+
+    keys = ["hello", "world", "crazy", "beans"]
+    od = collections.OrderedDict()
+    for k in keys:
+        od[k] = 0
+
+    assert typ.convert(od).keys() == keys
 
 
 # Make sure provider supports duplicate key names
