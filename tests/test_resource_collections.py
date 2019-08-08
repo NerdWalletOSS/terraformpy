@@ -163,6 +163,7 @@ def test_typed_attr_as_strings():
     assert tc.foo == '${data.data_type.data_id.baz}'
     assert tc.bar == '${data.data_type.data_id.baz["bbq"]}'
 
+
 def test_typed_attr_as_int():
     class TestCollection(ResourceCollection):
         foo = types.StringType(required=True)
@@ -176,6 +177,7 @@ def test_typed_attr_as_int():
     tc = TestCollection(foo=data.baz[0], bar=data.baz[1])
     assert tc.foo == '${data.data_type.data_id.baz[0]}'
     assert tc.bar == '${data.data_type.data_id.baz[1]}'
+
 
 def test_model_type():
     class C1(ResourceCollection):
