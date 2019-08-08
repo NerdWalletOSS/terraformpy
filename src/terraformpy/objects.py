@@ -205,7 +205,10 @@ class TypedObjectAttr(str):
         return obj
 
     def __getitem__(self, item):
-        return '${{{0}.{1}["{2}"]}}'.format(self._terraform_name, self._name, item)
+        if isinstance(item,int):
+            return '${{{0}.{1}[{2}]}}'.format(self._terraform_name, self._name, item)
+        else:
+            return '${{{0}.{1}["{2}"]}}'.format(self._terraform_name, self._name, item)
 
 
 class TypedObject(NamedObject):
