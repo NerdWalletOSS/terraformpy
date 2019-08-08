@@ -192,7 +192,10 @@ class TypedObjectAttr(str):
     """TypedObjectAttr is a wrapper returned by TypedObject for attributes accessed which don't exist.
 
     The main use case for needing an attr wrapper is accessing interpolated map values, such as those from the
-    aws_kms_secrets resource.
+    aws_kms_secrets resource.  We want to support both string-based and integer-based attribute access. Per the
+    documentation here:
+
+    https://www.terraform.io/docs/configuration/expressions.html#indices-and-attributes
     """
 
     def __new__(cls, terraform_name, name):

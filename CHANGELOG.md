@@ -1,3 +1,7 @@
+# 1.0.6
+
+Update TypedObjecAttr to format for integer-based arrays.
+
 # 1.0.5
 
 Added OrderedDictionary schema type
