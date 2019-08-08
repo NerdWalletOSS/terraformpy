@@ -4,6 +4,7 @@ This module provides a set of classes that can be used to build Terraform config
 while also leveraging Python to add some functional aspects to automate some of the more repetitive aspects of HCL.
 """
 import collections
+import numbers
 
 import six
 from schematics.types import compound
@@ -192,7 +193,10 @@ class TypedObjectAttr(str):
     """TypedObjectAttr is a wrapper returned by TypedObject for attributes accessed which don't exist.
 
     The main use case for needing an attr wrapper is accessing interpolated map values, such as those from the
-    aws_kms_secrets resource.
+    aws_kms_secrets resource.  We want to support both string-based and integer-based attribute access. Per the
+    documentation here:
+
+    https://www.terraform.io/docs/configuration/expressions.html#indices-and-attributes
     """
 
     def __new__(cls, terraform_name, name):
@@ -205,7 +209,10 @@ class TypedObjectAttr(str):
         return obj
 
     def __getitem__(self, item):
-        return '${{{0}.{1}["{2}"]}}'.format(self._terraform_name, self._name, item)
+        if isinstance(item, numbers.Integral):
+            return '${{{0}.{1}[{2}]}}'.format(self._terraform_name, self._name, item)
+        else:
+            return '${{{0}.{1}["{2}"]}}'.format(self._terraform_name, self._name, item)
 
 
 class TypedObject(NamedObject):
