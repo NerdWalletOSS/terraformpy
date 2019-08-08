@@ -4,6 +4,7 @@ This module provides a set of classes that can be used to build Terraform config
 while also leveraging Python to add some functional aspects to automate some of the more repetitive aspects of HCL.
 """
 import collections
+import numbers
 
 import six
 from schematics.types import compound
@@ -208,7 +209,7 @@ class TypedObjectAttr(str):
         return obj
 
     def __getitem__(self, item):
-        if isinstance(item, int):
+        if isinstance(item, numbers.Integral):
             return '${{{0}.{1}[{2}]}}'.format(self._terraform_name, self._name, item)
         else:
             return '${{{0}.{1}["{2}"]}}'.format(self._terraform_name, self._name, item)
