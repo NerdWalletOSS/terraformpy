@@ -179,6 +179,36 @@ def test_typed_attr_as_int():
     assert tc.bar == '${data.data_type.data_id.baz[1]}'
 
 
+def test_typed_item_recursion():
+    class TestCollection(ResourceCollection):
+        foo = types.StringType(required=True)
+        bar = types.StringType(required=True)
+
+        def create_resources(self):
+            pass
+
+    data = Data('data_type', 'data_id')
+
+    tc = TestCollection(foo=data.baz[0]["resource_collection"]["resource"], bar=data.baz[1]["resource_collection"]["resource"])
+    assert tc.foo == '${data.data_type.data_id.baz[0]["resource_collection"]["resource"]}'
+    assert tc.bar == '${data.data_type.data_id.baz[1]["resource_collection"]["resource"]}'
+
+
+# def test_typed_attr_recursion():
+#     class TestCollection(ResourceCollection):
+#         foo = types.StringType(required=True)
+#         bar = types.StringType(required=True)
+
+#         def create_resources(self):
+#             pass
+
+#     data = Data('data_type', 'data_id')
+
+#     tc = TestCollection(foo=data.baz[0].resource_collection.resource, bar=data.baz[1].resource_collection.resource)
+#     assert tc.foo == '${data.data_type.data_id.baz[0].resource_collection.resource}'
+#     assert tc.bar == '${data.data_type.data_id.baz[1].resource_collection.resource}'
+
+
 def test_model_type():
     class C1(ResourceCollection):
         foo = types.StringType(required=True)
