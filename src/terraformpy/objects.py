@@ -199,20 +199,27 @@ class TypedObjectAttr(str):
     https://www.terraform.io/docs/configuration/expressions.html#indices-and-attributes
     """
 
-    def __new__(cls, terraform_name, name):
+    def __new__(cls, terraform_name, name, item=None):
         obj = super(TypedObjectAttr, cls).__new__(cls, '${{{0}.{1}}}'.format(
             terraform_name,
-            name
+            cls._name_with_index(name, item)
         ))
         obj._terraform_name = terraform_name
         obj._name = name
+        obj._item = item
         return obj
 
-    def __getitem__(self, item):
-        if isinstance(item, numbers.Integral):
-            return '${{{0}.{1}[{2}]}}'.format(self._terraform_name, self._name, item)
+    @staticmethod
+    def _name_with_index(name, item):
+        if item is None:
+            return name
+        elif isinstance(item, numbers.Integral):
+            return '{0}[{1}]'.format(name, item)
         else:
-            return '${{{0}.{1}["{2}"]}}'.format(self._terraform_name, self._name, item)
+            return '{0}["{1}"]'.format(name, item)
+
+    def __getitem__(self, item):
+        return TypedObjectAttr(self._terraform_name, self._name_with_index(self._name, self._item), item)
 
 
 class TypedObject(NamedObject):
