@@ -218,18 +218,11 @@ class TypedObjectAttr(str):
         else:
             return '{0}["{1}"]'.format(name, item)
 
-    @staticmethod
-    def _name_with_attribute(name, item):
-        if item is None:
-            return name
-        else:
-            return '{0}.{1}'.format(name, item)
-
     def __getitem__(self, item):
         return TypedObjectAttr(self._terraform_name, self._name_with_index(self._name, self._item), item)
 
-    # def __getattr__(self, item):
-    #     return TypedObjectAttr(self._terraform_name, self._name_with_attribute(self._name, self._item), item)
+    def __getattr__(self, item):
+        return TypedObjectAttr(self._terraform_name, self._name_with_index(self._name, self._item), item)
 
 
 class TypedObject(NamedObject):
