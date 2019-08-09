@@ -1,3 +1,7 @@
+# 1.0.7
+
+Update TypedObjecAttr to build itself recursively.
+
 # 1.0.6
 
 Update TypedObjecAttr to format for integer-based arrays.
