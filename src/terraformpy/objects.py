@@ -213,10 +213,8 @@ class TypedObjectAttr(str):
     def _name_with_index(name, item):
         if item is None:
             return name
-        elif isinstance(item, numbers.Integral):
-            return '{0}[{1}]'.format(name, item)
         else:
-            return '{0}["{1}"]'.format(name, item)
+            return '{0}.{1}'.format(name, item)
 
     def __getitem__(self, item):
         return TypedObjectAttr(self._terraform_name, self._name_with_index(self._name, self._item), item)
