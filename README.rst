@@ -291,19 +291,11 @@ To help with this situation a function named ``relative_file`` inside of the ``t
 This would produce a definition that leverages the ``${file(...)}`` interpolation function with a path that reads the ``role_policy.json`` file from the same directory as the Python code that defined the role.
 
 
-Real-world use
-==============
-
-Create a new python project specifically to house your definitions and give you namespace you can use to define and import your reusable pieces.  Depend on terraformpy from your project.
-
-When proposing a change to the project use ``terraformpy plan -out=tf.plan`` (or similar) to generate a plan.  Apply the change in the generated plan and then commit the resulting state back to your project.
-
-
 Notes and Gotchas
------------------
+=================
 
 Security Group Rules and ``self``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 When creating ``aws_security_group_rule`` ``Resource`` objects you cannot pass ``self=True`` to the object since Python already passes a ``self`` argument into the constructor.  In this case you'll need to specify it directly in the ``_values``:
 
