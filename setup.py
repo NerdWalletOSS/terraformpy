@@ -9,7 +9,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
-        'schematics>=2.1,<3.0',
+        'schematics>=2.0,<3.0',
         'six>=1.11,<2'
     ],
     entry_points={
