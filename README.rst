@@ -17,17 +17,25 @@ Since `HCL`_ is "fully JSON compatible" and Python is great at generating JSON d
 Installing Terraformpy
 ----------------------
 
-Terraformpy is a standard Python package.  You can install it via ``pip``:
+The recommended way to install and use Terraformpy is via `Pipenv`_
+
+An example would look like:
 
 .. code-block:: bash
 
-    pip install terraformpy
+    $ mkdir my-terraform-project
+    $ cd my-terraform-project
+    $ pipenv install --two terraformpy
 
-If you'd like a way to distribute a self-contained ``terraformpy`` package within your team we recommend either `pex`_ or `shiv`_.
+You can then run Terraformpy using ``pipenv run``:
 
-.. _pex: https://github.com/pantsbuild/pex
-.. _shiv: https://github.com/linkedin/shiv
+.. code-block:: bash
 
+    $ pipenv run terraformpy ...
+
+Or you can use ``pipenv shell`` to activate the virtualenv so you don't need to use ``pipenv run``.  The rest of this document assumes that you've run ``pipenv shell`` and can just run ``terraformpy`` directly.
+
+.. _Pipenv: https://docs.pipenv.org/en/latest/
 
 Using the CLI tool
 ------------------
