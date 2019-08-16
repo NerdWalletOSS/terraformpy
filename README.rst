@@ -56,7 +56,7 @@ Writing ``.tf.py`` files
 
 The ``terraformpy`` name space provides a number of classes that map directly to things you declare in normal ``.tf.`` files.  To write your definitions simply import these classes and begin creating instances of them.  Below is the first example from the `Terraform getting start guide`_.
 
-.. _Terraform getting start guide: https://www.terraform.io/intro/getting-started/build.html#configuration
+.. _Terraform getting start guide: https://learn.hashicorp.com/terraform/getting-started/build.html#configuration
 
 .. code-block:: python
 
@@ -64,14 +64,13 @@ The ``terraformpy`` name space provides a number of classes that map directly to
 
     Provider(
         'aws',
-        access_key='ACCESS_KEY_HERE',
-        secret_key='SECRET_KEY_HERE',
+        profile='default',
         region='us-east-1'
     )
 
     Resource(
         'aws_instance', 'example',
-        ami='ami-0d729a60'
+        ami='ami-2757f631'
         instance_type='t2.micro'
     )
 
@@ -90,7 +89,7 @@ See the ``examples/`` dir for fully functional examples.
 Interpolation
 -------------
 
-So far, we've only used terraformpy anonymously, but the returned instances of the ``Data`` and ``Resource`` classes offer handy interpolation shortcuts.  For example, a common task is using the ``Data`` class to fetch remote data:
+So far, we've only used terraformpy anonymously, but the returned instances of the ``Data`` and ``Resource`` classes offer handy interpolation attributes.  For example, a common task is using the ``Data`` class to fetch remote data:
 
 .. code-block:: python
 
@@ -111,6 +110,8 @@ So far, we've only used terraformpy anonymously, but the returned instances of t
 
 Here we simply refer to the id attribute on the ami object when creating the ``aws_instance``.  During the compile phase it would be converted to the correct syntax: ``"${data.aws_ami.ecs_ami.id}"``.
 
+This works by having a custom ``__getattr__`` function on our ``Data`` and ``Resource`` objects that will turn any attribute access for an attribute name that doesn't exist into the Terraform interpolation syntax.
+
 
 Modules
 -------
@@ -125,9 +126,12 @@ Resource Collections
 
 A common pattern when building configs using Python is to want to abstract a number of different resources under the guise of a single object -- which is the same pattern native Terraform modules aim to solve.  In terraformpy we provide a ``ResourceCollection`` base class for building objects that represent multiple resources.
 
-You can use Schematics (https://schematics.readthedocs.io/en/latest/) to define the fields and perform validation.
+You can use `Schematics`_ to define the fields and perform validation.
 
 As an example, when provisioning an RDS cluster you may want to have a standard set of options that you ship with all your clusters.  You can express that with a resource collection:
+
+
+.. _Schematics: https://schematics.readthedocs.io/en/latest/
 
 .. code-block:: python
 
@@ -138,7 +142,9 @@ As an example, when provisioning an RDS cluster you may want to have a standard 
 
     class RDSCluster(ResourceCollection):
 
-        # Defining attributes of your resource collection is like defining a Schematics model
+        # Defining attributes of your resource collection is like defining a Schematics Model, in fact the
+        # ResourceCollection class is just a specialized subclass of the Schematics Model class.
+        #
         # Each attribute becomes a field on the collection, and can be provided as a keyword when constructing
         # an instance of your collection.
         #
