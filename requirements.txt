@@ -1,2 +1,2 @@
-schematics==2.0.1
+schematics==2.1.0
 six==1.12.0
