@@ -1,3 +1,7 @@
+# 1.0.8
+
+Update TypedObjecAttr to build dot-separated strings for ${resource-type.resource.attribute.key-name} value access.
+
 # 1.0.7
 
 Update TypedObjecAttr to build itself recursively.

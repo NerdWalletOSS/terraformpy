@@ -254,4 +254,4 @@ def test_attr_map_access():
         ]
     )
 
-    assert secrets.plaintext["foo"] == '${data.aws_kms_secrets.test.plaintext["foo"]}'
+    assert secrets.plaintext["foo"] == '${data.aws_kms_secrets.test.plaintext.foo}'

@@ -161,7 +161,7 @@ def test_typed_attr_as_strings():
 
     tc = TestCollection(foo=data.baz, bar=data.baz["bbq"])
     assert tc.foo == '${data.data_type.data_id.baz}'
-    assert tc.bar == '${data.data_type.data_id.baz["bbq"]}'
+    assert tc.bar == '${data.data_type.data_id.baz.bbq}'
 
 
 def test_typed_attr_as_int():
@@ -175,8 +175,8 @@ def test_typed_attr_as_int():
     data = Data('data_type', 'data_id')
 
     tc = TestCollection(foo=data.baz[0], bar=data.baz[1])
-    assert tc.foo == '${data.data_type.data_id.baz[0]}'
-    assert tc.bar == '${data.data_type.data_id.baz[1]}'
+    assert tc.foo == '${data.data_type.data_id.baz.0}'
+    assert tc.bar == '${data.data_type.data_id.baz.1}'
 
 
 def test_typed_item_recursion():
@@ -190,8 +190,8 @@ def test_typed_item_recursion():
     data = Data('data_type', 'data_id')
 
     tc = TestCollection(foo=data.baz[0]["resource_collection"]["resource"], bar=data.baz[1]["resource_collection"]["resource"])
-    assert tc.foo == '${data.data_type.data_id.baz[0]["resource_collection"]["resource"]}'
-    assert tc.bar == '${data.data_type.data_id.baz[1]["resource_collection"]["resource"]}'
+    assert tc.foo == '${data.data_type.data_id.baz.0.resource_collection.resource}'
+    assert tc.bar == '${data.data_type.data_id.baz.1.resource_collection.resource}'
 
 
 def test_typed_attr_recursion():
@@ -205,8 +205,8 @@ def test_typed_attr_recursion():
     data = Data('data_type', 'data_id')
 
     tc = TestCollection(foo=data.baz[0].resource_collection.resource, bar=data.baz[1].resource_collection.resource)
-    assert tc.foo == '${data.data_type.data_id.baz[0]["resource_collection"]["resource"]}'
-    assert tc.bar == '${data.data_type.data_id.baz[1]["resource_collection"]["resource"]}'
+    assert tc.foo == '${data.data_type.data_id.baz.0.resource_collection.resource}'
+    assert tc.bar == '${data.data_type.data_id.baz.1.resource_collection.resource}'
 
 
 def test_model_type():

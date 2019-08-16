@@ -4,7 +4,6 @@ This module provides a set of classes that can be used to build Terraform config
 while also leveraging Python to add some functional aspects to automate some of the more repetitive aspects of HCL.
 """
 import collections
-import numbers
 
 import six
 from schematics.types import compound
@@ -197,6 +196,12 @@ class TypedObjectAttr(str):
     documentation here:
 
     https://www.terraform.io/docs/configuration/expressions.html#indices-and-attributes
+
+    However, of note, it appears that several resources - varying by provider version - fail to fully implement both
+    specs.  After testing, it appears that dot-separated attributes are more consistently supported. As such, we want
+    to return values such as:
+
+    ${resource_type.resource_name.attribute.key_name}
     """
 
     def __new__(cls, terraform_name, name, item=None):
@@ -213,10 +218,8 @@ class TypedObjectAttr(str):
     def _name_with_index(name, item):
         if item is None:
             return name
-        elif isinstance(item, numbers.Integral):
-            return '{0}[{1}]'.format(name, item)
         else:
-            return '{0}["{1}"]'.format(name, item)
+            return '{0}.{1}'.format(name, item)
 
     def __getitem__(self, item):
         return TypedObjectAttr(self._terraform_name, self._name_with_index(self._name, self._item), item)
