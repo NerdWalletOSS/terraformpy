@@ -313,21 +313,6 @@ When proposing a change to the project use ``terraformpy plan -out=tf.plan`` (or
 change in the generated plan and then commit the resulting state back to your project.
 
 
-Local Testing
-==============
-
-* First things first, bump your VERSION file to something novel. You'll drop this change, don't overthink it!
-
-* ``indy build``, ``indy lint``, ``indy test``!
-
-* Once you have completed these bits, you should find that you have a shiny new ``whl`` inside of: ``terraformpy/build/dist/terraformpy/<<VERSION>>/wheel/terraformpy-<<VERSION>>-py2-none-any.whl``
-
-* Now, in the project you're running, with your ``venv`` activated, try this: ``pip install ~/my_code_dir/terraformpy/build/dist/terraformpy/<<VERSION>>/wheel/terraformpy-<<VERSION>>-py2-none-any.whl``
-
-* This should get you to the point where the ``terraformpy`` version in your ``venv`` is the new one you've created - try ``pip list`` to test.
-
-* Once you are done, clean up after yourself! Drop the ``VERSION`` bump, re-initialize your ``venv`` to a release version of ``terraformpy``.
-
 
 Notes and Gotchas
 -----------------

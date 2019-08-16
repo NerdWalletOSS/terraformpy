@@ -1,3 +1,7 @@
+# 1.1.0
+
+First open source release, no changes from 1.0.8
+
 # 1.0.8
 
 Update TypedObjecAttr to build dot-separated strings for ${resource-type.resource.attribute.key-name} value access.
