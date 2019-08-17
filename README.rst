@@ -1,7 +1,7 @@
 Terrafompy
 ==========
 
-Terraformpy is a library and command line tool for building Terraform configs using a full fledged Python environment to supercharge your `Terraform`_ configs.
+Terraformpy is a library and command line tool to supercharge your Terraform configs using a full fledged Python environment!
 
 `Terraform`_ is an amazing tool.  Like, really amazing.  When working with code that is managing third-party service definitions, and actually applying changes to those definitions by invoking APIs, a high-degree of confidence in the change process is a must-have, and that's where Terraform excels.  The work flow it empowers allow teams to quickly make changes across a large (and ever growing) footprint in multiple providers/regions/technologies/etc.
 

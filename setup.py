@@ -11,8 +11,8 @@ setup(
     version=VERSION,
     author="Evan Borgstrom",
     author_email="eborgstrom@nerdwallet.com",
-    description="Terraformpy is a library and command line tool for building Terraform configs using a full fledged "
-                "Python environment to supercharge your Terraform configs.",
+    description="Terraformpy is a library and command line tool to supercharge "
+                "your Terraform configs using a full fledged Python environment!",
     long_description=long_description,
     packages=find_packages('src'),
     package_dir={'': 'src'},
