@@ -57,8 +57,9 @@ class ResourceCollection(Model):
             if not k.endswith('_variant')
         )
 
-        super(ResourceCollection, self).__init__(kwargs, validate=True)
+        super(ResourceCollection, self).__init__(kwargs)
 
+        self.validate()
         self.create_resources()
 
     def relative_file(self, filename):
