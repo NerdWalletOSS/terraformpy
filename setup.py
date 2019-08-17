@@ -3,9 +3,17 @@ from setuptools import find_packages, setup
 with open('VERSION') as version_fd:
     VERSION = version_fd.read().strip()
 
+with open('README.rst') as readme_fd:
+    long_description = readme_fd.read()
+
 setup(
     name='terraformpy',
     version=VERSION,
+    author="Evan Borgstrom",
+    author_email="eborgstrom@nerdwallet.com",
+    description="Terraformpy is a library and command line tool for building Terraform configs using a full fledged "
+                "Python environment to supercharge your Terraform configs.",
+    long_description=long_description,
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
@@ -17,4 +25,17 @@ setup(
             'terraformpy = terraformpy.cli:main',
         ],
     },
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Information Technology",
+        "Intended Audience :: System Administrators",
+        "License :: OSI Approved :: Apache Software License",
+        "Natural Language :: English",
+        "Programming Language :: Python",
+        "Topic :: Software Development :: Libraries",
+        "Topic :: Software Development :: Pre-processors",
+        "Topic :: System :: Systems Administration",
+    ]
 )
