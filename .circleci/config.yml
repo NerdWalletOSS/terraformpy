@@ -1,0 +1,22 @@
+---
+# See the following file for a helpful template on setting up multiple Python jobs
+# https://github.com/excitedleigh/virtualfish/blob/aa3d6271bcb86ad27b6d24f96b5bd386d176f588/.circleci/config.yml
+
+version: 2
+jobs:
+  py27:
+    docker:
+      - image: circleci/python:2.7
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: |
+            python -m venv venv || virtualenv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install pytest
+      - run:
+          name: Pytest
+          command: |
+            ./venv/bin/pytest -v tests/
