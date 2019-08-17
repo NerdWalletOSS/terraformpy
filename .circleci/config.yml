@@ -3,6 +3,13 @@
 # https://github.com/excitedleigh/virtualfish/blob/aa3d6271bcb86ad27b6d24f96b5bd386d176f588/.circleci/config.yml
 
 version: 2
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - py27
+
 jobs:
   py27:
     docker:
