@@ -3,20 +3,41 @@
 # https://github.com/excitedleigh/virtualfish/blob/aa3d6271bcb86ad27b6d24f96b5bd386d176f588/.circleci/config.yml
 
 version: 2
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - py27
+      # TODO: - py37
+
 jobs:
-  py27:
+  py27: &template
     docker:
       - image: circleci/python:2.7
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
       - run:
           name: Install Dependencies
           command: |
             python -m venv venv || virtualenv venv
             . venv/bin/activate
             pip install -r requirements.txt
-            pip install pytest
+            pip install -e .[dev]
+      - save_cache:
+          paths:
+            ./venv/
+          key: v1-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
       - run:
           name: Pytest
           command: |
             ./venv/bin/pytest -v tests/
+
+# TODO:
+#  py37:
+#    <<: *template
+#    docker:
+#      - image: circleci/python:3.7
