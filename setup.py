@@ -20,6 +20,11 @@ setup(
         'schematics>=2.0,<3.0',
         'six>=1.11,<2'
     ],
+    extras_require={
+        'dev': [
+            'pytest>=4.6,<4.7',
+        ]
+    },
     entry_points={
         'console_scripts': [
             'terraformpy = terraformpy.cli:main',

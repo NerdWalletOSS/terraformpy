@@ -22,7 +22,7 @@ jobs:
             python -m venv venv || virtualenv venv
             . venv/bin/activate
             pip install -r requirements.txt
-            pip install pytest
+            pip install -e .[dev]
       - run:
           name: Pytest
           command: |
