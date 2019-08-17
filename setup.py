@@ -21,8 +21,11 @@ setup(
         'six>=1.11,<2'
     ],
     extras_require={
-        'dev': [
+        'dev:python_version <= "2.7"': [
             'pytest>=4.6,<4.7',
+        ],
+        'dev:python_version > "3"': [
+            'pytest>=5.0,<6',
         ]
     },
     entry_points={

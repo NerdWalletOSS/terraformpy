@@ -9,13 +9,17 @@ workflows:
   test:
     jobs:
       - py27
+      - py37
 
 jobs:
-  py27:
+  py27: &template
     docker:
       - image: circleci/python:2.7
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
       - run:
           name: Install Dependencies
           command: |
@@ -23,7 +27,16 @@ jobs:
             . venv/bin/activate
             pip install -r requirements.txt
             pip install -e .[dev]
+      - save_cache:
+          paths:
+            ./venv/
+          key: v1-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
       - run:
           name: Pytest
           command: |
             ./venv/bin/pytest -v tests/
+
+  py37:
+    <<: *template
+    docker:
+      - image: circleci/python:3.7
