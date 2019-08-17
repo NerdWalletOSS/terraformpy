@@ -9,7 +9,7 @@ workflows:
   test:
     jobs:
       - py27
-      - py37
+      # TODO: - py37
 
 jobs:
   py27: &template
@@ -36,7 +36,8 @@ jobs:
           command: |
             ./venv/bin/pytest -v tests/
 
-  py37:
-    <<: *template
-    docker:
-      - image: circleci/python:3.7
+# TODO:
+#  py37:
+#    <<: *template
+#    docker:
+#      - image: circleci/python:3.7
