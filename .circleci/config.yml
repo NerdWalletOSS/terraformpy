@@ -43,7 +43,7 @@ jobs:
           name: Pytest
           command: |
             ./venv/bin/pytest -v tests/
-  publish: &template
+  publish:
     docker:
       - image: circleci/python:2.7
     steps:
