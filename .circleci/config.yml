@@ -61,7 +61,7 @@ jobs:
           name: create packages
           command: |
             python setup.py sdist
-	          python setup.py bdist_wheel
+            python setup.py bdist_wheel
       - run:
           name: upload to pypi
           command: |
