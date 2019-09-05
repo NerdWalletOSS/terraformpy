@@ -9,6 +9,14 @@ workflows:
   test:
     jobs:
       - py27
+      - publish:
+          requires:
+            - py27
+          filters:
+            tags:
+              only: /[0-9]+(\.[0-9]+)*/
+            branches:
+              only: enable-pypi-publishing
       # TODO: - py37
 
 jobs:
@@ -35,7 +43,30 @@ jobs:
           name: Pytest
           command: |
             ./venv/bin/pytest -v tests/
-
+  publish: &template
+    docker:
+      - image: circleci/python:2.7
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
+      - run:
+          name: verify git tag vs. version
+          command: |
+            python -m venv venv || virtualenv venv
+            . venv/bin/activate
+            python setup.py verify
+      - run:
+          name: create packages
+          command: |
+            python setup.py sdist
+	          python setup.py bdist_wheel
+      - run:
+          name: upload to pypi
+          command: |
+            . venv/bin/activate
+            twine upload --config .pypirc -r testpypi dist/*
 # TODO:
 #  py37:
 #    <<: *template

@@ -4,7 +4,8 @@ src/indy/specs/build/vendored/*
 # build directories
 /build/
 /docs/_build/
-
+/dist/
+/venv/
 # compiled files
 *.o
 *.a
