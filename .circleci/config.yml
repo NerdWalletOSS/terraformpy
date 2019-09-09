@@ -38,7 +38,7 @@ jobs:
       - save_cache:
           paths:
             ./venv/
-          key: v1-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
+          key: v1-{{ arch }}-{{ .Environment.CIRCLE_PROJECT }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
       - run:
           name: Pytest
           command: |
@@ -50,7 +50,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
+            - v1-{{ arch }}-{{ .Environment.CIRCLE_PROJECT }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
       - run:
           name: verify git tag vs. version
           command: |
