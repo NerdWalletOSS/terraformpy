@@ -56,7 +56,7 @@ jobs:
           command: |
             python -m venv venv || virtualenv venv
             . venv/bin/activate
-#            python setup.py verify
+            python setup.py verify
       - run:
           name: create packages
           command: |
