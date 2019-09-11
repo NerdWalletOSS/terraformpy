@@ -9,8 +9,9 @@ workflows:
   test:
     jobs:
       - py27:
-          tags:
-            only: /^v.*/
+          filters:
+            tags:
+              only: /^v.*/
       - publish:
           requires:
             - py27
