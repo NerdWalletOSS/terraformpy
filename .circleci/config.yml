@@ -69,7 +69,7 @@ jobs:
           name: upload to pypi
           command: |
             . venv/bin/activate
-            ./venv/bin/twine upload --config .pypirc -r testpypi dist/* --password $PYPI_PASSWORD_TEST
+            ./venv/bin/twine upload --config .pypirc -r pypi dist/* --password $PYPI_PASSWORD_PROD
 # TODO:
 #  py37:
 #    <<: *template
