@@ -8,7 +8,7 @@ workflows:
   version: 2
   test:
     jobs:
-      - py27
+      - py27:
           tags:
             only: /^v.*/
       - publish:
