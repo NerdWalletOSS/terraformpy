@@ -8,7 +8,18 @@ workflows:
   version: 2
   test:
     jobs:
-      - py27
+      - py27:
+          filters:
+            tags:
+              only: /^v.*/
+      - publish:
+          requires:
+            - py27
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
       # TODO: - py37
 
 jobs:
@@ -30,12 +41,34 @@ jobs:
       - save_cache:
           paths:
             ./venv/
-          key: v1-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
+          key: v1-{{ arch }}-{{ .Environment.CIRCLE_PROJECT }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
       - run:
           name: Pytest
           command: |
             ./venv/bin/pytest -v tests/
-
+  publish:
+    docker:
+      - image: circleci/python:2.7
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-{{ arch }}-{{ .Environment.CIRCLE_PROJECT }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
+      - run:
+          name: verify git tag vs. version
+          command: |
+            python -m venv venv || virtualenv venv
+            . venv/bin/activate
+            python setup.py verify
+      - run:
+          name: create packages
+          command: |
+            python setup.py sdist
+            python setup.py bdist_wheel
+      - run:
+          name: upload to pypi
+          command: |
+            ./venv/bin/twine upload --config .pypirc -r pypi dist/* --password $PYPI_PASSWORD_PROD
 # TODO:
 #  py37:
 #    <<: *template

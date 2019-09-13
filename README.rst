@@ -315,3 +315,11 @@ When creating ``aws_security_group_rule`` ``Resource`` objects you cannot pass `
         vpc_id=vpc.id,
         ...
     )
+
+Release Steps
+=================
+1. Create an issue, check out a branch, and make your code changes.
+2. Push to run CircleCI tests.
+3. Create Pull Request to Master including VERSION bump.
+4. Merge PR after Approval.
+5. Add tag like v1.0.0 that matches new version and push.
