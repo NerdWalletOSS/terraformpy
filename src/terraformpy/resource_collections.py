@@ -15,6 +15,7 @@ limitations under the License.
 """
 
 import six
+from schematics.exceptions import MockCreationError
 from schematics.models import Model
 
 from terraformpy.helpers import relative_file as _relative_file
@@ -52,6 +53,13 @@ class ResourceCollection(Model):
         if len(args) > 0 and kwargs.get('context') is not None:
             super(ResourceCollection, self).__init__(*args, **kwargs)
             return
+
+        # there are still some places in underlying schematics stuff that
+        # invoke model constructors in the traditional way, but without
+        # context. get_mock_object() is one of these cases
+        if len(kwargs) == 0 and len(args) == 1 and isinstance(args[0], dict):
+            kwargs = args[0]
+            args = tuple()
 
         if variant_name is None and Variant.CURRENT_VARIANT is not None:
             variant_name = Variant.CURRENT_VARIANT.name

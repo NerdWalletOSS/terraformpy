@@ -1,3 +1,7 @@
+# 1.1.1
+
+Fix `get_mock_object()` for `ResourceCollection`
+
 # 1.1.0
 
 First open source release, no changes from 1.0.8
