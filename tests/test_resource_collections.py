@@ -242,3 +242,31 @@ def test_model_type():
     c2 = C2(c1=c1)
 
     assert c2.c1.foo == 'foo'
+
+
+def test_mock_object_creation():
+    class C1(ResourceCollection):
+        foo = types.StringType(required=True)
+
+        def create_resources(self):
+            pass
+
+    class TestCollection(ResourceCollection):
+        foo = types.StringType(required=True)
+        bar = types.StringType(required=True)
+        baz = types.IntType(required=True)
+        c1 = compound.ModelType(C1, required=True)
+
+        def create_resources(self):
+            pass
+
+    tc = TestCollection.get_mock_object()
+
+    # When the bug presented itself, these fields would have been set to None
+    # because the original get_mock_object implementation passes the fields
+    # as a single dictionary. There is probably a more elegant way to do this,
+    # but it's sufficient that the objects can be created without errors
+    assert tc.foo is not None
+    assert tc.bar is not None
+    assert tc.baz is not None
+    assert tc.c1.foo is not None
