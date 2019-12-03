@@ -42,14 +42,39 @@ class DuplicateKey(str):
     # Preserving usage order will help plan output remain consistent across invocations
     next_hash_per_str = collections.defaultdict(lambda: 0)
 
-    def __init__(self, key=''):
-        super(DuplicateKey, self).__init__(key)
+    def __new__(cls, key):
+        inst = super(DuplicateKey, cls).__new__(cls, key)
 
-        self.hash = DuplicateKey.next_hash_per_str[key]
-        DuplicateKey.next_hash_per_str[key] = self.hash + 1
+        inst.hash = DuplicateKey.next_hash_per_str[key]
+        DuplicateKey.next_hash_per_str[key] = inst.hash + 1
+
+        return inst
 
     def __hash__(self):
         return self.hash
+
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self.hash == other.hash
+
+    def __lt__(self, other):
+        if self.__class__ == other.__class__:
+            return self.hash < other.hash
+        return super(DuplicateKey, self).__lt__(other)
+
+    def __le__(self, other):
+        if self.__class__ == other.__class__:
+            return self.hash <= other.hash
+        return super(DuplicateKey, self).__le__(other)
+
+    def __gt__(self, other):
+        if self.__class__ == other.__class__:
+            return self.hash > other.hash
+        return super(DuplicateKey, self).__gt__(other)
+
+    def __ge__(self, other):
+        if self.__class__ == other.__class__:
+            return self.hash >= other.hash
+        return super(DuplicateKey, self).__ge__(other)
 
 
 class OrderedDict(compound.DictType):
@@ -86,7 +111,7 @@ class TFObject(object):
 
     def __new__(cls, *args, **kwargs):
         # create the instance
-        inst = super(TFObject, cls).__new__(cls, *args, **kwargs)
+        inst = super(TFObject, cls).__new__(cls)
 
         # register it on the class
         try:
