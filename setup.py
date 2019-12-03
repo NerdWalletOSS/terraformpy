@@ -33,6 +33,7 @@ setup(
     author_email="eborgstrom@nerdwallet.com",
     description="Terraformpy is a library and command line tool to supercharge "
                 "your Terraform configs using a full fledged Python environment!",
+    url="https://github.com/NerdWalletOSS/terraformpy",
     long_description=long_description,
     packages=find_packages('src'),
     package_dir={'': 'src'},
