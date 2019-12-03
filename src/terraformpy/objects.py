@@ -37,43 +37,52 @@ def recursive_update(dest, source):
     return dest
 
 
-# Provider names are duplicate keys in the resulting json, so we need a way to represent that
 class DuplicateKey(str):
-    # Preserving usage order will help plan output remain consistent across invocations
-    next_hash_per_str = collections.defaultdict(lambda: 0)
+    """DuplicateKey provides a native string (str) replacement that can be used as a
+    dictionary key that will serialize out to JSON and maintain the duplicity.
+
+    This is needed because the JSON representation of HCL requires duplicate keys for
+    provider resources, which is technically not against the JSON spec[1].
+
+    Insertion order is preserved by using a counter value as the hash value per unique
+    key that is generated using this class.
+
+    [1]: https://stackoverflow.com/a/21833017/11439015
+    """
+    _next_hash = collections.defaultdict(lambda: 0)
 
     def __new__(cls, key):
         inst = super(DuplicateKey, cls).__new__(cls, key)
 
-        inst.hash = DuplicateKey.next_hash_per_str[key]
-        DuplicateKey.next_hash_per_str[key] = inst.hash + 1
+        inst._hash = DuplicateKey._next_hash[key]
+        DuplicateKey._next_hash[key] += 1
 
         return inst
 
     def __hash__(self):
-        return self.hash
+        return self._hash
 
     def __eq__(self, other):
-        return self.__class__ == other.__class__ and self.hash == other.hash
+        return self.__class__ == other.__class__ and self._hash == other._hash
 
     def __lt__(self, other):
         if self.__class__ == other.__class__:
-            return self.hash < other.hash
+            return self._hash < other._hash
         return super(DuplicateKey, self).__lt__(other)
 
     def __le__(self, other):
         if self.__class__ == other.__class__:
-            return self.hash <= other.hash
+            return self._hash <= other._hash
         return super(DuplicateKey, self).__le__(other)
 
     def __gt__(self, other):
         if self.__class__ == other.__class__:
-            return self.hash > other.hash
+            return self._hash > other._hash
         return super(DuplicateKey, self).__gt__(other)
 
     def __ge__(self, other):
         if self.__class__ == other.__class__:
-            return self.hash >= other.hash
+            return self._hash >= other._hash
         return super(DuplicateKey, self).__ge__(other)
 
 
