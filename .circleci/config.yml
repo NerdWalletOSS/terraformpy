@@ -8,10 +8,10 @@ workflows:
   version: 2
   test:
     jobs:
-      - py27:
-          filters:
-            tags:
-              only: /^v.*/
+      - py27
+      - py36
+      - py37
+      - py38
       - publish:
           requires:
             - py27
@@ -46,9 +46,25 @@ jobs:
           name: Pytest
           command: |
             ./venv/bin/pytest -v tests/
+
+  py36:
+    <<: *template
+    docker:
+      - image: circleci/python:3.6
+
+  py37:
+    <<: *template
+    docker:
+      - image: circleci/python:3.7
+
+  py38:
+    <<: *template
+    docker:
+      - image: circleci/python:3.8
+
   publish:
     docker:
-      - image: circleci/python:2.7
+      - image: circleci/python:3.7
     steps:
       - checkout
       - restore_cache:
@@ -69,8 +85,3 @@ jobs:
           name: upload to pypi
           command: |
             ./venv/bin/twine upload --config .pypirc -r pypi dist/* --password $PYPI_PASSWORD_PROD
-# TODO:
-#  py37:
-#    <<: *template
-#    docker:
-#      - image: circleci/python:3.7
