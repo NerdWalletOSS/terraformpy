@@ -1,6 +1,3 @@
-# vendored files that get fetched during setup
-src/indy/specs/build/vendored/*
-
 # build directories
 /build/
 /docs/_build/
@@ -36,20 +33,9 @@ node_modules/*
 .uwsgi-reload
 
 # Test output
-nosetests.xml
-src/.coverage
-src/cover
-.noseids
+.coverage
 
 # Misc
 .DS_Store
 *#
 *~
-
-# Testing
-dump.rdb
-
-# Celery
-celerybeat.pid
-celerybeat-schedule
-celerybeat-schedule.db
