@@ -1,6 +1,14 @@
-# 1.1.1
+# 1.1.3
+
+* Fix distribution, we need to include the `VERSION` file
+
+# 1.1.2
 
 Fix `get_mock_object()` for `ResourceCollection`
+
+# 1.1.1
+
+Publish via CircleCI
 
 # 1.1.0
 
