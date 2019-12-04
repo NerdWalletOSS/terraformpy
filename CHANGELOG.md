@@ -1,3 +1,7 @@
+# 1.2.1
+
+* Add support for HCL modules via the new `Module` object
+
 # 1.2.0
 
 * Support Python 3.5+

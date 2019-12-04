@@ -20,7 +20,7 @@ import json
 import pytest
 import schematics.types
 
-from terraformpy import Data, DuplicateKey, OrderedDict, Provider, Resource, Terraform, TFObject, Variable, Variant
+from terraformpy import Data, DuplicateKey, Module, OrderedDict, Provider, Resource, Terraform, TFObject, Variable, Variant
 
 
 def test_object_instances():
@@ -271,3 +271,22 @@ def test_attr_map_access():
     )
 
     assert secrets.plaintext["foo"] == '${data.aws_kms_secrets.test.plaintext.foo}'
+
+
+def test_module():
+    mod = Module(
+        "consul",
+        source="hashicorp/consul/aws",
+        version="0.0.5",
+        servers=3
+    )
+
+    assert mod.build() == {
+        "module": {
+            "consul": {
+                "source": "hashicorp/consul/aws",
+                "version": "0.0.5",
+                "servers": 3
+            }
+        }
+    }

@@ -1,7 +1,20 @@
-.. image:: https://img.shields.io/pypi/v/terraformpy?color=blue
-.. image:: https://img.shields.io/badge/python-2.7%20%7C%203.5%20%7C%203.6%20%7C%203.7%20%7C%203.8-blue
-.. image:: https://img.shields.io/pypi/format/terraformpy?color=blue
-.. image:: https://img.shields.io/pypi/l/terraformpy?color=blue
+|pypi| |versions| |format| |license| |coverage|
+
+.. |pypi| image:: https://img.shields.io/pypi/v/terraformpy?color=blue
+   :target: https://pypi.org/project/terraformpy
+
+.. |versions| image:: https://img.shields.io/badge/python-2.7%20%7C%203.5%20%7C%203.6%20%7C%203.7%20%7C%203.8-blue
+   :target: https://pypi.org/project/terraformpy
+
+.. |format| image:: https://img.shields.io/pypi/format/terraformpy?color=blue
+   :target: https://pypi.org/project/terraformpy
+
+.. |license| image:: https://img.shields.io/pypi/l/terraformpy?color=blue
+   :target: https://pypi.org/project/terraformpy
+
+.. |coverage| image:: https://codecov.io/gh/NerdWalletOSS/terraformpy/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/NerdWalletOSS/terraformpy
+
 
 Terrafompy
 ==========
@@ -90,11 +103,13 @@ The ``terraformpy`` name space provides a number of classes that map directly to
 
 Things you can import from ``terraformpy``:
 
-* ``Provider``
-* ``Variable``
-* ``Data``
-* ``Resource``
-* ``Output``
+* ``Resource`` - https://www.terraform.io/docs/configuration/resources.html
+* ``Provider`` - https://www.terraform.io/docs/configuration/providers.html
+* ``Variable`` - https://www.terraform.io/docs/configuration/variables.html
+* ``Output`` - https://www.terraform.io/docs/configuration/outputs.html
+* ``Module`` - https://www.terraform.io/docs/configuration/modules.html
+* ``Data`` - https://www.terraform.io/docs/configuration/data-sources.html
+* ``Terraform`` - https://www.terraform.io/docs/configuration/terraform.html
 
 See the ``examples/`` dir for fully functional examples.
 
@@ -129,9 +144,19 @@ This works by having a custom ``__getattr__`` function on our ``Data`` and ``Res
 Modules
 -------
 
-Modules have been explicitly excluded from this implementation because they aim to solve the same problem -- building reusable blocks in your Terraform configs.
+Since Terraformpy gives you the full power of Python we encourage you to use "Resource Collections" (see the next section) when you're building your own modular functionality and you don't plan on sharing these modules outside of your current organization.
 
-With all the features of Python at your disposal building reusable units is straightforward without using the native modules from Terraform, but do see Resource Collections (next) for some helper scaffolding!
+You can however leverage existing HCL modules using the ``Module`` object if you want to use pre-built, existing modules:
+
+.. code-block:: python
+
+    Module(
+        "consul",
+        source="hashicorp/consul/aws",
+        version="0.0.5",
+
+        servers=3
+    )
 
 
 Resource Collections
