@@ -46,7 +46,9 @@ jobs:
       - run:
           name: Pytest
           command: |
-            ./venv/bin/pytest -v tests/
+            . venv/bin/activate
+            pytest --cov=src/ -v tests/
+            codecov
 
   py35:
     <<: *template

@@ -47,7 +47,11 @@ setup(
         ],
         'dev:python_version > "3"': [
             'pytest>=5.0,<6',
-        ]
+        ],
+        'dev': {
+            'pytest-cov',
+            'codecov'
+        }
     },
     entry_points={
         'console_scripts': [
