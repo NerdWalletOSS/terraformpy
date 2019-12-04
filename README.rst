@@ -1,4 +1,4 @@
-|pypi| |versions| |format| |license|
+|pypi| |versions| |format| |license| |coverage|
 
 .. |pypi| image:: https://img.shields.io/pypi/v/terraformpy?color=blue
    :target: https://pypi.org/project/terraformpy
@@ -11,6 +11,9 @@
 
 .. |license| image:: https://img.shields.io/pypi/l/terraformpy?color=blue
    :target: https://pypi.org/project/terraformpy
+
+.. |coverage| image:: https://codecov.io/gh/NerdWalletOSS/terraformpy/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/NerdWalletOSS/terraformpy
 
 
 Terrafompy
