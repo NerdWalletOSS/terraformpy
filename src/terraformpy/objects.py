@@ -419,6 +419,11 @@ class Output(NamedObject):
     TF_TYPE = "output"
 
 
+class Module(NamedObject):
+    """Represents a Terraform module"""
+    TF_TYPE = "module"
+
+
 class Data(TypedObject):
     """Represents a Terraform data source"""
     TF_TYPE = "data"
