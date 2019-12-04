@@ -1,3 +1,8 @@
+.. image:: https://img.shields.io/pypi/v/terraformpy?color=blue
+.. image:: https://img.shields.io/badge/python-2.7%20%7C%203.5%20%7C%203.6%20%7C%203.7%20%7C%203.8-blue
+.. image:: https://img.shields.io/pypi/format/terraformpy?color=blue
+.. image:: https://img.shields.io/pypi/l/terraformpy?color=blue
+
 Terrafompy
 ==========
 
@@ -25,7 +30,7 @@ An example would look like:
 
     $ mkdir my-terraform-project
     $ cd my-terraform-project
-    $ pipenv install --two terraformpy
+    $ pipenv install terraformpy
 
 You can then run Terraformpy using ``pipenv run``:
 

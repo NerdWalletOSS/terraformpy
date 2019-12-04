@@ -193,7 +193,7 @@ def test_ordered_dict():
     for k in keys:
         od[k] = 0
 
-    assert typ.convert(od).keys() == keys
+    assert list(typ.convert(od).keys()) == keys
 
 
 # Make sure provider supports duplicate key names

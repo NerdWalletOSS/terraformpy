@@ -1,3 +1,7 @@
+# 1.2.0
+
+* Support Python 3.5+
+
 # 1.1.3
 
 * Fix distribution, we need to include the `VERSION` file
