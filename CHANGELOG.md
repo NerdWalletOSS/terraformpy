@@ -1,6 +1,6 @@
 # 1.2.0
 
-* Support Python 3.6+
+* Support Python 3.5+
 
 # 1.1.3
 

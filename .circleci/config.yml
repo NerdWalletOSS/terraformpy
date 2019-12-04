@@ -9,6 +9,7 @@ workflows:
   test:
     jobs:
       - py27
+      - py35
       - py36
       - py37
       - py38
@@ -46,6 +47,11 @@ jobs:
           name: Pytest
           command: |
             ./venv/bin/pytest -v tests/
+
+  py35:
+    <<: *template
+    docker:
+      - image: circleci/python:3.5
 
   py36:
     <<: *template
