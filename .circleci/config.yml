@@ -73,14 +73,9 @@ jobs:
       - image: circleci/python:3.7
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
       - run:
           name: verify git tag vs. version
           command: |
-            python -m venv venv || virtualenv venv
-            . venv/bin/activate
             python setup.py verify
       - run:
           name: create packages
@@ -90,4 +85,7 @@ jobs:
       - run:
           name: upload to pypi
           command: |
-            ./venv/bin/twine upload --config .pypirc -r pypi dist/* --password $PYPI_PASSWORD_PROD
+            python -m venv venv || virtualenv venv
+            . venv/bin/activate
+            pip install 'twine>=3.1.1,<4'
+            twine upload --config .pypirc -r pypi dist/* --password $PYPI_PASSWORD_PROD
