@@ -8,7 +8,7 @@ In this example the VPC data we pull in from the remote state has 3 AZs/subnets 
 across.
 """
 
-from terraformpy import Data, Provider, Resource
+from terraformpy import Data, Provider, Resource, Terraform
 
 # we build our launch configs based on the following data
 # each key should be an instance type and the value should be a tuple: (price, vCPUs)
@@ -18,6 +18,17 @@ spot_config = {
     'c4.2xlarge': (0.419, 8),
 }
 
+Terraform(
+    backend=dict(
+        s3=dict(
+            region="us-east-1",
+            bucket="terraform-tfstate-bucket",
+            key="terraform.tfstate",
+            workspace_key_prefix="my_prefix",
+            dynamodb_table="terraform_locks",
+        )
+    )
+)
 
 Provider(
     'aws',

@@ -141,6 +141,27 @@ Here we simply refer to the id attribute on the ami object when creating the ``a
 This works by having a custom ``__getattr__`` function on our ``Data`` and ``Resource`` objects that will turn any attribute access for an attribute name that doesn't exist into the Terraform interpolation syntax.
 
 
+Backend
+-------
+
+Configuring a backend happens in the `Terraform` object. See `Configuring a Terraform Backend`_ for more details.
+
+Bellow we are using an S3 Backend:
+
+.. code-block:: python
+
+    Terraform(
+        backend=dict(
+            s3=dict(
+                region="us-east-1",
+                bucket="terraform-tfstate-bucket",
+                key="terraform.tfstate",
+                workspace_key_prefix="my_prefix",
+                dynamodb_table="terraform_locks",
+            )
+        )
+    )
+
 Modules
 -------
 
@@ -353,3 +374,5 @@ Release Steps
 3. Create Pull Request to Master including VERSION bump.
 4. Merge PR after Approval.
 5. Add tag like v1.0.0 that matches new version and push.
+
+.. _`Configuring a Terraform Backend`: https://www.terraform.io/docs/configuration/terraform.html#configuring-a-terraform-backend
