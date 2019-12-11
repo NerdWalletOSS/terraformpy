@@ -42,11 +42,13 @@ def relative_file(filename, _caller_depth=1):
         "template": "${file(\"${path.module}/../../../modules/mything/files/foo.json\")}",
 
     """
-    return '${{file("{0}")}}'.format(relative_path(filename, _caller_depth=_caller_depth+1))
+    return '${{file("{0}")}}'.format(
+        relative_path(filename, _caller_depth=_caller_depth + 1)
+    )
 
 
 def relative_path(path, _caller_depth=1):
     caller = inspect.stack()[_caller_depth]
-    return '${{path.module}}/{0}'.format(
+    return "${{path.module}}/{0}".format(
         os.path.relpath(os.path.join(os.path.dirname(caller[1]), path))
     )

@@ -22,7 +22,7 @@ from schematics.types import compound
 from terraformpy.objects import Data, Resource
 from terraformpy.resource_collections import ResourceCollection, Variant
 
-if hasattr(schematics.exceptions, 'ConversionError'):
+if hasattr(schematics.exceptions, "ConversionError"):
     # schematics 2+
     SCHEMATICS_EXCEPTIONS = (
         schematics.exceptions.ValidationError,
@@ -40,12 +40,12 @@ def test_resource_collection():
         bar = types.BooleanType(default=True)
 
         def create_resources(self):
-            self.res1 = Resource('res1', 'foo', foo=self.foo)
+            self.res1 = Resource("res1", "foo", foo=self.foo)
 
-    tc = TestCollection(foo='foo!')
-    assert tc.foo == 'foo!'
-    assert tc.res1.foo == 'foo!'
-    assert tc.res1.id == '${res1.foo.id}'
+    tc = TestCollection(foo="foo!")
+    assert tc.foo == "foo!"
+    assert tc.res1.foo == "foo!"
+    assert tc.res1.id == "${res1.foo.id}"
 
     with pytest.raises(SCHEMATICS_EXCEPTIONS):
         TestCollection()
@@ -54,46 +54,40 @@ def test_resource_collection():
 def test_variants():
     class TestCollection(ResourceCollection):
         foo = types.StringType(required=True)
-        bar = types.StringType(default='default bar!')
+        bar = types.StringType(default="default bar!")
 
         def create_resources(self):
-            self.res1 = Resource('res1', 'foo', foo=self.foo)
+            self.res1 = Resource("res1", "foo", foo=self.foo)
 
     def make_collection():
         return TestCollection(
-            foo='foo!',
-
-            prod_variant=dict(
-                bar='prod bar!'
-            ),
-
-            stage_variant=dict(
-                bar='stage bar!'
-            )
+            foo="foo!",
+            prod_variant=dict(bar="prod bar!"),
+            stage_variant=dict(bar="stage bar!"),
         )
 
     tc = make_collection()
-    assert tc.bar == 'default bar!'
+    assert tc.bar == "default bar!"
 
-    with Variant('prod'):
+    with Variant("prod"):
         tc = make_collection()
-        assert tc.bar == 'prod bar!'
+        assert tc.bar == "prod bar!"
 
-    with Variant('stage'):
+    with Variant("stage"):
         tc = make_collection()
-        assert tc.bar == 'stage bar!'
+        assert tc.bar == "stage bar!"
 
 
 def test_multiple_variants():
     assert Variant.CURRENT_VARIANT is None
 
-    with Variant('foo'):
-        assert Variant.CURRENT_VARIANT.name == 'foo'
+    with Variant("foo"):
+        assert Variant.CURRENT_VARIANT.name == "foo"
 
-        with Variant('bar'):
-            assert Variant.CURRENT_VARIANT.name == 'bar'
+        with Variant("bar"):
+            assert Variant.CURRENT_VARIANT.name == "bar"
 
-        assert Variant.CURRENT_VARIANT.name == 'foo'
+        assert Variant.CURRENT_VARIANT.name == "foo"
 
     assert Variant.CURRENT_VARIANT is None
 
@@ -101,56 +95,51 @@ def test_multiple_variants():
 def test_schematics():
     class TestCollection(ResourceCollection):
         foo = types.StringType(required=True)
-        bar = types.StringType(default='')
+        bar = types.StringType(default="")
         baz = types.EmailType(required=True)
 
         def create_resources(self):
             pass
 
         def validate_foo(self, data, value):
-            if not value.endswith('!'):
-                raise schematics.exceptions.ValidationError('foo must end in !')
+            if not value.endswith("!"):
+                raise schematics.exceptions.ValidationError("foo must end in !")
 
     with pytest.raises(SCHEMATICS_EXCEPTIONS):
-        TestCollection(foo='foo!')
+        TestCollection(foo="foo!")
 
     with pytest.raises(SCHEMATICS_EXCEPTIONS):
-        TestCollection(foo='foo!', baz='not an email')
+        TestCollection(foo="foo!", baz="not an email")
 
     with pytest.raises(SCHEMATICS_EXCEPTIONS):
-        TestCollection(foo='no-exclaimation-mark', baz='baz@baz.com')
+        TestCollection(foo="no-exclaimation-mark", baz="baz@baz.com")
 
-    tc = TestCollection(foo='foo!', baz='bbq@lol.tld')
-    assert tc.baz == 'bbq@lol.tld'
-    assert tc.foo == 'foo!'
+    tc = TestCollection(foo="foo!", baz="bbq@lol.tld")
+    assert tc.baz == "bbq@lol.tld"
+    assert tc.foo == "foo!"
 
 
 def test_variant_defaults():
     class TestCollection(ResourceCollection):
         foo = types.StringType(required=True)
-        bar = types.StringType(default='default bar!')
+        bar = types.StringType(default="default bar!")
 
         def create_resources(self):
-            self.res1 = Resource('res1', 'foo', foo=self.foo)
+            self.res1 = Resource("res1", "foo", foo=self.foo)
 
-    with Variant('testing', foo='variant default foo!'):
+    with Variant("testing", foo="variant default foo!"):
         tc = TestCollection()
-        assert tc.foo == 'variant default foo!'
+        assert tc.foo == "variant default foo!"
 
-    with Variant('testing2', bar='variant default bar!'):
-        tc = TestCollection(foo='test foo!')
-        assert tc.foo == 'test foo!'
-        assert tc.bar == 'variant default bar!'
+    with Variant("testing2", bar="variant default bar!"):
+        tc = TestCollection(foo="test foo!")
+        assert tc.foo == "test foo!"
+        assert tc.bar == "variant default bar!"
 
-    with Variant('testing3'):
-        tc = TestCollection(
-            foo='test foo!',
-            testing3_variant=dict(
-                foo='testing3 foo!'
-            )
-        )
-        assert tc.foo == 'testing3 foo!'
-        assert tc.bar == 'default bar!'
+    with Variant("testing3"):
+        tc = TestCollection(foo="test foo!", testing3_variant=dict(foo="testing3 foo!"))
+        assert tc.foo == "testing3 foo!"
+        assert tc.bar == "default bar!"
 
 
 def test_relative_file():
@@ -158,11 +147,11 @@ def test_relative_file():
         foo = types.StringType(required=True)
 
         def create_resources(self):
-            self.res1 = Resource('res1', 'foo', foo=self.foo)
+            self.res1 = Resource("res1", "foo", foo=self.foo)
 
-    tc = TestCollection(foo='foo!')
+    tc = TestCollection(foo="foo!")
 
-    assert tc.relative_file('foo') == '${file("${path.module}/tests/foo")}'
+    assert tc.relative_file("foo") == '${file("${path.module}/tests/foo")}'
 
 
 def test_typed_attr_as_strings():
@@ -173,11 +162,11 @@ def test_typed_attr_as_strings():
         def create_resources(self):
             pass
 
-    data = Data('data_type', 'data_id')
+    data = Data("data_type", "data_id")
 
     tc = TestCollection(foo=data.baz, bar=data.baz["bbq"])
-    assert tc.foo == '${data.data_type.data_id.baz}'
-    assert tc.bar == '${data.data_type.data_id.baz.bbq}'
+    assert tc.foo == "${data.data_type.data_id.baz}"
+    assert tc.bar == "${data.data_type.data_id.baz.bbq}"
 
 
 def test_typed_attr_as_int():
@@ -188,11 +177,11 @@ def test_typed_attr_as_int():
         def create_resources(self):
             pass
 
-    data = Data('data_type', 'data_id')
+    data = Data("data_type", "data_id")
 
     tc = TestCollection(foo=data.baz[0], bar=data.baz[1])
-    assert tc.foo == '${data.data_type.data_id.baz.0}'
-    assert tc.bar == '${data.data_type.data_id.baz.1}'
+    assert tc.foo == "${data.data_type.data_id.baz.0}"
+    assert tc.bar == "${data.data_type.data_id.baz.1}"
 
 
 def test_typed_item_recursion():
@@ -203,11 +192,14 @@ def test_typed_item_recursion():
         def create_resources(self):
             pass
 
-    data = Data('data_type', 'data_id')
+    data = Data("data_type", "data_id")
 
-    tc = TestCollection(foo=data.baz[0]["resource_collection"]["resource"], bar=data.baz[1]["resource_collection"]["resource"])
-    assert tc.foo == '${data.data_type.data_id.baz.0.resource_collection.resource}'
-    assert tc.bar == '${data.data_type.data_id.baz.1.resource_collection.resource}'
+    tc = TestCollection(
+        foo=data.baz[0]["resource_collection"]["resource"],
+        bar=data.baz[1]["resource_collection"]["resource"],
+    )
+    assert tc.foo == "${data.data_type.data_id.baz.0.resource_collection.resource}"
+    assert tc.bar == "${data.data_type.data_id.baz.1.resource_collection.resource}"
 
 
 def test_typed_attr_recursion():
@@ -218,11 +210,14 @@ def test_typed_attr_recursion():
         def create_resources(self):
             pass
 
-    data = Data('data_type', 'data_id')
+    data = Data("data_type", "data_id")
 
-    tc = TestCollection(foo=data.baz[0].resource_collection.resource, bar=data.baz[1].resource_collection.resource)
-    assert tc.foo == '${data.data_type.data_id.baz.0.resource_collection.resource}'
-    assert tc.bar == '${data.data_type.data_id.baz.1.resource_collection.resource}'
+    tc = TestCollection(
+        foo=data.baz[0].resource_collection.resource,
+        bar=data.baz[1].resource_collection.resource,
+    )
+    assert tc.foo == "${data.data_type.data_id.baz.0.resource_collection.resource}"
+    assert tc.bar == "${data.data_type.data_id.baz.1.resource_collection.resource}"
 
 
 def test_model_type():
@@ -238,10 +233,10 @@ def test_model_type():
         def create_resources(self):
             pass
 
-    c1 = C1(foo='foo')
+    c1 = C1(foo="foo")
     c2 = C2(c1=c1)
 
-    assert c2.c1.foo == 'foo'
+    assert c2.c1.foo == "foo"
 
 
 def test_mock_object_creation():

@@ -1,41 +1,28 @@
-# build directories
-/build/
-/docs/_build/
-/dist/
-/venv/
-# compiled files
-*.o
+
+*#
 *.a
-*.so
-*.pyc
-
-# egg / dist info files
-.eggs/
-.cache/
-*.egg-info
 *.dist-info
-
-# vim swap files
-.*.sw[op]
-
-# Keystore files
-*.jks
-
-# Project files
-node_modules/*
-/.vscode/
-.idea/
+*.egg-info
 *.iml
+*.jks
+*.o
+*.pyc
+*.so
+*~
+.*.sw[op]
+.DS_Store
+.cache/
+.coverage
+.eggs/
+.idea/
 .project
 .pydevproject
 .ropeproject
 .settings
 .uwsgi-reload
-
-# Test output
-.coverage
-
-# Misc
-.DS_Store
-*#
-*~
+/.vscode/
+/build/
+/dist/
+/docs/_build/
+/venv/
+node_modules/*

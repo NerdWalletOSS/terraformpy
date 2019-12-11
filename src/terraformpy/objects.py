@@ -49,6 +49,7 @@ class DuplicateKey(str):
 
     [1]: https://stackoverflow.com/a/21833017/11439015
     """
+
     _next_hash = collections.defaultdict(lambda: 0)
 
     def __new__(cls, key):
@@ -137,6 +138,7 @@ class TFObject(object):
             cls._instances = None
             for klass in cls.__subclasses__():
                 recursive_reset(klass)
+
         recursive_reset(cls)
         TFObject._frozen = False
 
@@ -156,6 +158,7 @@ class TFObject(object):
             for klass in cls.__subclasses__():
                 results += recursive_compile(klass)
             return results
+
         configs = recursive_compile(cls)
 
         result = {}
@@ -175,13 +178,12 @@ class Terraform(TFObject):
         self._values.update(kwargs)
 
     def build(self):
-        return {
-            'terraform': self._values
-        }
+        return {"terraform": self._values}
 
 
 class NamedObject(TFObject):
     """Named objects are the Terraform definitions that only have a single name component (i.e. variable or output)"""
+
     # When recursively compiling, the "type" of object that is written out to the terraform definition needs to point to
     # the top-most subclass of TFobject.  For example, if you create a subclass of Resource named MyResource any
     # instances still needs to be written out to the json as "resource" and not "myresource".  This must be set to an
@@ -192,7 +194,9 @@ class NamedObject(TFObject):
         """When creating a TF Object you can supply _values if you want to directly influence the values of the object,
         like when you're creating security group rules and need to specify `self`
         """
-        assert self.TF_TYPE is not None, "Bad programmer.  Set TF_TYPE on %s" % self.__class__.__name__
+        assert self.TF_TYPE is not None, (
+            "Bad programmer.  Set TF_TYPE on %s" % self.__class__.__name__
+        )
 
         self._name = _name
         self._values = _values or {}
@@ -201,14 +205,14 @@ class NamedObject(TFObject):
             self._values.update(kwargs)
         else:
             for name in kwargs:
-                if not name.endswith('_variant'):
+                if not name.endswith("_variant"):
                     self._values[name] = kwargs[name]
-                elif name == '{0}_variant'.format(Variant.CURRENT_VARIANT.name):
+                elif name == "{0}_variant".format(Variant.CURRENT_VARIANT.name):
                     self._values.update(kwargs[name])
 
     def __setattr__(self, name, value):
-        if '_values' in self.__dict__ and name in self.__dict__['_values']:
-            self.__dict__['_values'][name] = value
+        if "_values" in self.__dict__ and name in self.__dict__["_values"]:
+            self.__dict__["_values"][name] = value
         else:
             self.__dict__[name] = value
 
@@ -216,21 +220,23 @@ class NamedObject(TFObject):
         """This is here as a safety so that you cannot generate hard to debug .tf.json files"""
         if not TFObject._frozen and name in self._values:
             return self._values[name]
-        raise AttributeError("%ss does not provide attribute interpolation through attribute access!" %
-                             self.__class__.__name__)
+        raise AttributeError(
+            "%ss does not provide attribute interpolation through attribute access!"
+            % self.__class__.__name__
+        )
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and self._name == other._name and self._values == other._values
+        return (
+            isinstance(other, self.__class__)
+            and self._name == other._name
+            and self._values == other._values
+        )
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def build(self):
-        result = {
-            self.TF_TYPE: {
-                self._name: self._values
-            }
-        }
+        result = {self.TF_TYPE: {self._name: self._values}}
         return result
 
     def __repr__(self):
@@ -254,10 +260,9 @@ class TypedObjectAttr(str):
     """
 
     def __new__(cls, terraform_name, name, item=None):
-        obj = super(TypedObjectAttr, cls).__new__(cls, '${{{0}.{1}}}'.format(
-            terraform_name,
-            cls._name_with_index(name, item)
-        ))
+        obj = super(TypedObjectAttr, cls).__new__(
+            cls, "${{{0}.{1}}}".format(terraform_name, cls._name_with_index(name, item))
+        )
         obj._terraform_name = terraform_name
         obj._name = name
         obj._item = item
@@ -268,13 +273,17 @@ class TypedObjectAttr(str):
         if item is None:
             return name
         else:
-            return '{0}.{1}'.format(name, item)
+            return "{0}.{1}".format(name, item)
 
     def __getitem__(self, item):
-        return TypedObjectAttr(self._terraform_name, self._name_with_index(self._name, self._item), item)
+        return TypedObjectAttr(
+            self._terraform_name, self._name_with_index(self._name, self._item), item
+        )
 
     def __getattr__(self, item):
-        return TypedObjectAttr(self._terraform_name, self._name_with_index(self._name, self._item), item)
+        return TypedObjectAttr(
+            self._terraform_name, self._name_with_index(self._name, self._item), item
+        )
 
 
 class TypedObject(NamedObject):
@@ -297,8 +306,8 @@ class TypedObject(NamedObject):
         self._type = _type
 
         try:
-            if Provider.CURRENT_PROVIDER._name == self._type.split('_')[0]:
-                self._values['provider'] = Provider.CURRENT_PROVIDER.as_provider()
+            if Provider.CURRENT_PROVIDER._name == self._type.split("_")[0]:
+                self._values["provider"] = Provider.CURRENT_PROVIDER.as_provider()
         except AttributeError:
             # CURRENT_PROVIDER is None
             pass
@@ -308,7 +317,7 @@ class TypedObject(NamedObject):
 
     @property
     def terraform_name(self):
-        return '.'.join([self._type, self._name])
+        return ".".join([self._type, self._name])
 
     def interpolated(self, name):
         """If you reference an attr on a TFObject that was provided as a value you will always get back the python object
@@ -342,13 +351,7 @@ class TypedObject(NamedObject):
         return TypedObjectAttr(self.terraform_name, name)
 
     def build(self):
-        result = {
-            self.TF_TYPE: {
-                self._type: {
-                    self._name: self._values
-                }
-            }
-        }
+        result = {self.TF_TYPE: {self._type: {self._name: self._values}}}
         return result
 
     def __repr__(self):
@@ -371,11 +374,14 @@ class Provider(NamedObject):
 
         assert sg.provider == 'aws.west2'
     """
+
     TF_TYPE = "provider"
     CURRENT_PROVIDER = None
 
     def __enter__(self):
-        assert self._values['alias'], "Providers must have an alias to be used as a context manager!"
+        assert self._values[
+            "alias"
+        ], "Providers must have an alias to be used as a context manager!"
         self._previous_provider = Provider.CURRENT_PROVIDER
         Provider.CURRENT_PROVIDER = self
 
@@ -383,15 +389,11 @@ class Provider(NamedObject):
         Provider.CURRENT_PROVIDER = self._previous_provider
 
     def as_provider(self):
-        return '.'.join([self._name, self._values['alias']])
+        return ".".join([self._name, self._values["alias"]])
 
     # override build to support duplicate key values
     def build(self):
-        result = {
-            self.TF_TYPE: {
-                DuplicateKey(self._name): self._values
-            }
-        }
+        result = {self.TF_TYPE: {DuplicateKey(self._name): self._values}}
         return result
 
 
@@ -405,10 +407,11 @@ class Variable(NamedObject):
         var = Variable('my_var', default='foo')
         assert var == '${var.my_var}'
     """
+
     TF_TYPE = "variable"
 
     def __repr__(self):
-        return '${{var.{0}}}'.format(self._name)
+        return "${{var.{0}}}".format(self._name)
 
     def __str__(self):
         return self.__repr__()
@@ -416,23 +419,27 @@ class Variable(NamedObject):
 
 class Output(NamedObject):
     """Represents a Terraform output"""
+
     TF_TYPE = "output"
 
 
 class Module(NamedObject):
     """Represents a Terraform module"""
+
     TF_TYPE = "module"
 
 
 class Data(TypedObject):
     """Represents a Terraform data source"""
+
     TF_TYPE = "data"
 
     @property
     def terraform_name(self):
-        return '.'.join(['data', super(Data, self).terraform_name])
+        return ".".join(["data", super(Data, self).terraform_name])
 
 
 class Resource(TypedObject):
     """Represents a Terraform resource"""
+
     TF_TYPE = "resource"
