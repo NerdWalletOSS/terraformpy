@@ -297,7 +297,7 @@ class TypedObject(NamedObject):
         self._type = _type
 
         try:
-            if Provider.CURRENT_PROVIDER._name == self._type.split('_')[0]:
+            if 'provider' not in kwargs and Provider.CURRENT_PROVIDER._name == self._type.split('_')[0]:
                 self._values['provider'] = Provider.CURRENT_PROVIDER.as_provider()
         except AttributeError:
             # CURRENT_PROVIDER is None

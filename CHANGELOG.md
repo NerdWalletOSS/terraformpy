@@ -1,3 +1,8 @@
+# 1.2.2
+
+* Fix bug: An explicit `provider` kwarg should take precedence over the `CURRENT_PROVIDER`
+  from a `Provider` being used as a context manager.
+
 # 1.2.1
 
 * Add support for HCL modules via the new `Module` object
