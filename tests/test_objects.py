@@ -183,8 +183,12 @@ def test_explicit_provider():
         sg1 = Resource("aws_security_group", "sg", ingress=["foo"], provider=p1.as_provider())
         sg2 = Resource("aws_security_group", "sg", ingress=["foo"])
 
+        with Provider("aws", region="eu-west-2", alias="london"):
+            sg3 = Resource("aws_security_group", "sg", ingress=["foo"])
+
     assert sg1.provider == "aws.west2"
     assert sg2.provider == "aws.east1"
+    assert sg3.provider == "aws.london"
 
 
 def test_duplicate_key():
