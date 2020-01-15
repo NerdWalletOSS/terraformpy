@@ -310,14 +310,13 @@ def test_module():
 
 
 def test_duplicate_key_collisions():
-    """It was found that with a lot of different provider objects we were able to cause
-    collisions in the DuplicateKey hash method such that when we compiled we would
-    lose some of the entries.
+    """When creating two different types of Provider objects they would collide with
+    each other during recursive update because they had the same __hash__ value
 
     The fix was use the hash() value of the key being provide PLUS our incremented ID
 
-    This test covers that by making sure that the number of compiled objects equals
-    what we created
+    This test covers that by making sure that all of the expected providers are in our
+    compiled output.
     """
     TFObject.reset()
 
