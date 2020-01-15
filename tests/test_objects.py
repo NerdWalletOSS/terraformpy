@@ -306,3 +306,27 @@ def test_module():
             }
         }
     }
+
+
+def test_duplicate_key_collisions():
+    """It was found that with a lot of different provider objects we were able to cause
+    collisions in the DuplicateKey hash method such that when we compiled we would
+    lose some of the entries.
+
+    The fix was use the hash() value of the key being provide PLUS our incremented ID
+
+    This test covers that by making sure that the number of compiled objects equals
+    what we created
+    """
+    TFObject.reset()
+
+    for x in range(10):
+        Provider("aws", region="us-east-{}".format(x), alias="aws{}".format(x))
+        if x % 2 == 0:
+            Provider("mysql", alias="mysql{}".format(x))
+
+    assert len(Provider._instances) == 15
+
+    compiled = Provider.compile()
+
+    assert len(compiled["provider"]) == 15
