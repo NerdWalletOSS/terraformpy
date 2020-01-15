@@ -210,6 +210,8 @@ def test_provider():
     Provider("mysql", host="db-wordpress")
     Provider("mysql", host="db-finpro")
 
+    compiled = TFObject.compile()
+
     seen = []
     for data in six.itervalues(compiled["provider"]):
         seen.append(data["host"])
