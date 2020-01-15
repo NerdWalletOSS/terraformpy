@@ -192,16 +192,6 @@ def test_explicit_provider():
     assert sg3.provider == "aws.london"
 
 
-def test_duplicate_key():
-    # ordering should ensure it's always <firstCreatedKey>, <secondCreatedKey>
-    # so let's ensure that works, even if say the value names are backwards-sorted
-    key2 = DuplicateKey("mysql")
-    key1 = DuplicateKey("mysql")
-    encoded = json.dumps({key1: {"user": "wyatt1"}, key2: {"user": "wyatt2"}}, sort_keys=True)
-    desired = '{"mysql": {"user": "wyatt1"}, "mysql": {"user": "wyatt2"}}'
-    assert encoded == desired
-
-
 def test_ordered_dict():
     typ = OrderedDict(schematics.types.IntType)
 
@@ -220,10 +210,12 @@ def test_provider():
     Provider("mysql", host="db-wordpress")
     Provider("mysql", host="db-finpro")
 
-    result = json.dumps(TFObject.compile(), sort_keys=True)
-    desired = '{"provider": {"mysql": {"host": "db-finpro"}, "mysql": {"host": "db-wordpress"}}}'
+    seen = []
+    for data in six.itervalues(compiled["provider"]):
+        seen.append(data["host"])
 
-    assert result == desired
+    seen.sort()
+    assert seen == ["db-finpro", "db-wordpress"]
 
 
 def test_interpolated():
