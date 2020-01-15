@@ -19,6 +19,7 @@ import json
 
 import pytest
 import schematics.types
+import six
 
 from terraformpy import Data, DuplicateKey, Module, OrderedDict, Provider, Resource, Terraform, TFObject, Variable, Variant
 
@@ -191,16 +192,6 @@ def test_explicit_provider():
     assert sg3.provider == "aws.london"
 
 
-def test_duplicate_key():
-    # ordering should ensure it's always <firstCreatedKey>, <secondCreatedKey>
-    # so let's ensure that works, even if say the value names are backwards-sorted
-    key2 = DuplicateKey("mysql")
-    key1 = DuplicateKey("mysql")
-    encoded = json.dumps({key1: {"user": "wyatt1"}, key2: {"user": "wyatt2"}}, sort_keys=True)
-    desired = '{"mysql": {"user": "wyatt2"}, "mysql": {"user": "wyatt1"}}'
-    assert encoded == desired
-
-
 def test_ordered_dict():
     typ = OrderedDict(schematics.types.IntType)
 
@@ -219,10 +210,14 @@ def test_provider():
     Provider("mysql", host="db-wordpress")
     Provider("mysql", host="db-finpro")
 
-    result = json.dumps(TFObject.compile(), sort_keys=True)
-    desired = '{"provider": {"mysql": {"host": "db-wordpress"}, "mysql": {"host": "db-finpro"}}}'
+    compiled = TFObject.compile()
 
-    assert result == desired
+    seen = []
+    for data in six.itervalues(compiled["provider"]):
+        seen.append(data["host"])
+
+    seen.sort()
+    assert seen == ["db-finpro", "db-wordpress"]
 
 
 def test_interpolated():
@@ -306,3 +301,31 @@ def test_module():
             }
         }
     }
+
+
+def test_duplicate_key_collisions():
+    """When creating two different types of Provider objects they would collide with
+    each other during recursive update because they had the same __hash__ value
+
+    The fix was use the hash() value of the key being provide PLUS our incremented ID
+
+    This test covers that by making sure that all of the expected providers are in our
+    compiled output.
+    """
+    TFObject.reset()
+
+    Provider("aws", alias="aws1")
+    Provider("aws", alias="aws2")
+    Provider("mysql", alias="mysql1")
+    Provider("mysql", alias="mysql2")
+
+    assert len(Provider._instances) == 4
+
+    compiled = Provider.compile()
+
+    seen = []
+    for data in six.itervalues(compiled["provider"]):
+        seen.append(data["alias"])
+
+    seen.sort()
+    assert seen == ["aws1", "aws2", "mysql1", "mysql2"]

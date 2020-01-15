@@ -54,7 +54,7 @@ class DuplicateKey(str):
     def __new__(cls, key):
         inst = super(DuplicateKey, cls).__new__(cls, key)
 
-        inst._hash = DuplicateKey._next_hash[key]
+        inst._hash = hash((key, DuplicateKey._next_hash[key]))
         DuplicateKey._next_hash[key] += 1
 
         return inst
@@ -374,6 +374,10 @@ class Provider(NamedObject):
     TF_TYPE = "provider"
     CURRENT_PROVIDER = None
 
+    def __init__(self, *args, **kwargs):
+        super(Provider, self).__init__(*args, **kwargs)
+        self._key = DuplicateKey(self._name)
+
     def __enter__(self):
         assert self._values['alias'], "Providers must have an alias to be used as a context manager!"
         self._previous_provider = Provider.CURRENT_PROVIDER
@@ -389,7 +393,7 @@ class Provider(NamedObject):
     def build(self):
         result = {
             self.TF_TYPE: {
-                DuplicateKey(self._name): self._values
+                self._key: self._values
             }
         }
         return result
