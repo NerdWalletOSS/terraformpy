@@ -19,6 +19,7 @@ import json
 
 import pytest
 import schematics.types
+import six
 
 from terraformpy import Data, DuplicateKey, Module, OrderedDict, Provider, Resource, Terraform, TFObject, Variable, Variant
 
@@ -320,14 +321,18 @@ def test_duplicate_key_collisions():
     """
     TFObject.reset()
 
-    for x in range(10):
-        Provider("aws", region="us-east-{}".format(x), alias="aws{}".format(x))
-        if x % 2 == 0:
-            Provider("mysql", alias="mysql{}".format(x))
+    Provider("aws", alias="aws1")
+    Provider("aws", alias="aws2")
+    Provider("mysql", alias="mysql1")
+    Provider("mysql", alias="mysql2")
 
-    assert len(Provider._instances) == 15
+    assert len(Provider._instances) == 4
 
     compiled = Provider.compile()
 
-    assert json.dumps(compiled, sort_keys=True) == '{"provider": {"mysql": {"alias": "mysql0"}, "mysql": {"alias": "mysql2"}, "mysql": {"alias": "mysql4"}, "mysql": {"alias": "mysql6"}, "mysql": {"alias": "mysql8"}, "aws": {"alias": "aws0", "region": "us-east-0"}, "aws": {"alias": "aws1", "region": "us-east-1"}, "aws": {"alias": "aws2", "region": "us-east-2"}, "aws": {"alias": "aws3", "region": "us-east-3"}, "aws": {"alias": "aws4", "region": "us-east-4"}, "aws": {"alias": "aws5", "region": "us-east-5"}, "aws": {"alias": "aws6", "region": "us-east-6"}, "aws": {"alias": "aws7", "region": "us-east-7"}, "aws": {"alias": "aws8", "region": "us-east-8"}, "aws": {"alias": "aws9", "region": "us-east-9"}}}'  # noqa
+    seen = []
+    for data in six.itervalues(compiled["provider"]):
+        seen.append(data["alias"])
 
+    seen.sort()
+    assert seen == ["aws1", "aws2", "mysql1", "mysql2"]
