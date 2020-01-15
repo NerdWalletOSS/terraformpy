@@ -1,3 +1,8 @@
+# 1.2.3
+
+* Fix bug: Multiple providers of different types were colliding with each other
+  https://github.com/NerdWalletOSS/terraformpy/pull/62
+
 # 1.2.2
 
 * Fix bug: An explicit `provider` kwarg should take precedence over the `CURRENT_PROVIDER`
