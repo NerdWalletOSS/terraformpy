@@ -329,4 +329,5 @@ def test_duplicate_key_collisions():
 
     compiled = Provider.compile()
 
-    assert len(compiled["provider"]) == 15
+    assert json.dumps(compiled, sort_keys=True) == '{"provider": {"mysql": {"alias": "mysql0"}, "mysql": {"alias": "mysql2"}, "mysql": {"alias": "mysql4"}, "mysql": {"alias": "mysql6"}, "mysql": {"alias": "mysql8"}, "aws": {"alias": "aws0", "region": "us-east-0"}, "aws": {"alias": "aws1", "region": "us-east-1"}, "aws": {"alias": "aws2", "region": "us-east-2"}, "aws": {"alias": "aws3", "region": "us-east-3"}, "aws": {"alias": "aws4", "region": "us-east-4"}, "aws": {"alias": "aws5", "region": "us-east-5"}, "aws": {"alias": "aws6", "region": "us-east-6"}, "aws": {"alias": "aws7", "region": "us-east-7"}, "aws": {"alias": "aws8", "region": "us-east-8"}, "aws": {"alias": "aws9", "region": "us-east-9"}}}'  # noqa
+
