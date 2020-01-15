@@ -54,7 +54,7 @@ class DuplicateKey(str):
     def __new__(cls, key):
         inst = super(DuplicateKey, cls).__new__(cls, key)
 
-        inst._hash = hash(key) + DuplicateKey._next_hash[key]
+        inst._hash = hash((key, DuplicateKey._next_hash[key]))
         DuplicateKey._next_hash[key] += 1
 
         return inst

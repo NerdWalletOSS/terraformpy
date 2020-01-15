@@ -198,7 +198,7 @@ def test_duplicate_key():
     key2 = DuplicateKey("mysql")
     key1 = DuplicateKey("mysql")
     encoded = json.dumps({key1: {"user": "wyatt1"}, key2: {"user": "wyatt2"}}, sort_keys=True)
-    desired = '{"mysql": {"user": "wyatt2"}, "mysql": {"user": "wyatt1"}}'
+    desired = '{"mysql": {"user": "wyatt1"}, "mysql": {"user": "wyatt2"}}'
     assert encoded == desired
 
 
@@ -221,7 +221,7 @@ def test_provider():
     Provider("mysql", host="db-finpro")
 
     result = json.dumps(TFObject.compile(), sort_keys=True)
-    desired = '{"provider": {"mysql": {"host": "db-wordpress"}, "mysql": {"host": "db-finpro"}}}'
+    desired = '{"provider": {"mysql": {"host": "db-finpro"}, "mysql": {"host": "db-wordpress"}}}'
 
     assert result == desired
 
