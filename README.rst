@@ -367,12 +367,36 @@ When creating ``aws_security_group_rule`` ``Resource`` objects you cannot pass `
         ...
     )
 
+Developer notes
+===============
+
+Running tests
+-------------
+
+We use tox to run tests.  While developing locally you can run:
+
+.. code-block::
+
+    tox
+
+
+Formatting with black
+---------------------
+
+We use black to format code.  To apply formatting run:
+
+.. code-block::
+
+    tox -e black -- .
+
+
 Release Steps
-=================
-1. Create an issue, check out a branch, and make your code changes.
-2. Push to run CircleCI tests.
-3. Create Pull Request to Master including VERSION bump.
-4. Merge PR after Approval.
-5. Add tag like v1.0.0 that matches new version and push.
+-------------
+
+1. Make a branch
+2. Make your changes
+3. Bump the version in the VERSION file and add an entry to the CHANGELOG.md file
+4. Open a PR, tag @NerdWalletOSS/dynamorm in your PR description
+5. Once approved and merged to master the new version will be pushed to pypi
 
 .. _`Configuring a Terraform Backend`: https://www.terraform.io/docs/configuration/terraform.html#configuring-a-terraform-backend
