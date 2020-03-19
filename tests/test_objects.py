@@ -23,7 +23,6 @@ import six
 
 from terraformpy import (
     Data,
-    DuplicateKey,
     Module,
     OrderedDict,
     Provider,
@@ -298,3 +297,61 @@ def test_duplicate_key_collisions():
 
     seen.sort()
     assert seen == ["aws1", "aws2", "mysql1", "mysql2"]
+
+
+def test_named_object_hooks(mocker):
+    TFObject.reset()
+
+    def aws_hook(attrs):
+        new_attrs = attrs.copy()
+        new_attrs["region"] = "us-east-1"
+        return new_attrs
+
+    mock_hook = mocker.MagicMock(side_effect=aws_hook)
+
+    Provider.add_hook("aws", mock_hook)
+    Provider("aws", alias="aws1")
+
+    compiled = TFObject.compile()
+
+    assert mock_hook.mock_calls == [mocker.call({"alias": "aws1"})]
+
+    # since providers use DuplicateKey as their key we need to json dump to compare equality here
+    assert json.dumps(compiled) == json.dumps(
+        {"provider": {"aws": {"alias": "aws1", "region": "us-east-1"}}}
+    )
+
+
+def test_typed_object_hooks(mocker):
+    """Ensure that our hooks work as expected and can modify resource data during compilation"""
+    TFObject.reset()
+
+    def attr_always_true(object_id, object_attrs):
+        """attr_always_true is a contrived hook that ensures `attr` of `some_type` resources is always True"""
+        object_attrs = object_attrs.copy()
+        for attr_name in object_attrs:
+            if attr_name == "attr":
+                object_attrs[attr_name] = True
+        return object_attrs
+
+    # Make our hook a mock so we can assert on calls
+    mock_hook = mocker.MagicMock(side_effect=attr_always_true)
+
+    # Add the hook for resources
+    Resource.add_hook("some_type", mock_hook)
+
+    Resource("some_type", "some_id", attr=True)
+    Resource("some_type", "other_id", attr=False)
+
+    compiled = TFObject.compile()
+
+    assert mock_hook.mock_calls == [
+        mocker.call("some_id", {"attr": True}),
+        mocker.call("other_id", {"attr": False}),
+    ]
+
+    assert compiled == {
+        "resource": {
+            "some_type": {"some_id": {"attr": True,}, "other_id": {"attr": True,}}
+        }
+    }

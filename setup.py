@@ -46,7 +46,7 @@ setup(
     extras_require={
         'dev:python_version <= "2.7"': ["pytest>=4.6,<4.7",],
         'dev:python_version > "3"': ["pytest>=5.0,<6",],
-        "dev": {"pytest-cov", "codecov"},
+        "dev": {"pytest-cov", "pytest-mock", "codecov"},
     },
     entry_points={"console_scripts": ["terraformpy = terraformpy.cli:main",],},
     classifiers=[

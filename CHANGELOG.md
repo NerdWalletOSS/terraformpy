@@ -1,3 +1,7 @@
+# 1.3.0
+
+* Add Hooks to the different object types.  See the README and inline code for docs.
+
 # 1.2.4
 
 * No functional changes
