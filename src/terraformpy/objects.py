@@ -118,6 +118,7 @@ class OrderedDict(compound.DictType):
 class TFObject(object):
     _instances = None
     _frozen = False
+    _hooks = None
 
     def __new__(cls, *args, **kwargs):
         # create the instance
@@ -133,6 +134,25 @@ class TFObject(object):
         return inst
 
     @classmethod
+    def add_hook(cls, object_type, hook):
+        """Add a hook for the given object type
+
+        The hook will receive the full built object and is expected to return the updated object to be used when
+        recursively adding to the final output.
+
+        Generally you will want to use the add_hook method on the final object type (i.e. Resource.add_hook) instead
+        of this method, as the other add_hook methods provide sugar for typed and named objects.
+
+        See NamedObject.add_hook and TypedObject.add_hook
+        """
+        try:
+            TFObject._hooks[object_type].append(hook)
+        except TypeError:
+            TFObject._hooks = {object_type: [hook]}
+        except KeyError:
+            TFObject._hooks[object_type] = [hook]
+
+    @classmethod
     def reset(cls):
         def recursive_reset(cls):
             cls._instances = None
@@ -141,6 +161,7 @@ class TFObject(object):
 
         recursive_reset(cls)
         TFObject._frozen = False
+        TFObject._hooks = None
 
     @classmethod
     def compile(cls):
@@ -151,6 +172,16 @@ class TFObject(object):
             try:
                 for instance in cls._instances:
                     output = instance.build()
+
+                    for object_type in output:
+                        try:
+                            hooks = TFObject._hooks[object_type]
+                        except (TypeError, KeyError):
+                            pass
+                        else:
+                            for hook in hooks:
+                                output = hook(output)
+
                     results.append(output)
             except TypeError:
                 pass
@@ -166,12 +197,19 @@ class TFObject(object):
             result = recursive_update(result, config)
         return result
 
+    def build(self):
+        raise NotImplementedError
+
 
 class Terraform(TFObject):
     """Represents Terraform configuration.
 
     See: https://www.terraform.io/docs/configuration/terraform.html
     """
+
+    @classmethod
+    def add_hook(cls, hook):
+        TFObject.add_hook("terraform", hook)
 
     def __init__(self, _values=None, **kwargs):
         self._values = _values or {}
@@ -189,6 +227,37 @@ class NamedObject(TFObject):
     # instances still needs to be written out to the json as "resource" and not "myresource".  This must be set to an
     # appropriate value at each specific subclass that maps to a terraform resource type.
     TF_TYPE = None
+
+    @classmethod
+    def add_hook(cls, object_name, hook):
+        """Add a hook for anything that's a direct subclass of NamedObject (i.e. Provider, Variable, etc)
+
+        Unlike the TFobject.add_hook method the hook added for a named object receives just the output for the object
+        name, rather than the full compiled output.
+
+        For example::
+
+            Provider.add_hook("aws", my_hook)
+            Provider("aws", alias="aws")
+
+        Then your my_hook function would be called like::
+
+            my_hook({"alias": "aws"})
+
+        """
+
+        def named_hook(output):
+            for output_name in output[cls.TF_TYPE]:
+                if output_name != object_name:
+                    continue
+
+                output[cls.TF_TYPE][output_name] = hook(
+                    output[cls.TF_TYPE][output_name]
+                )
+
+            return output
+
+        TFObject.add_hook(cls.TF_TYPE, named_hook)
 
     def __init__(self, _name, _values=None, **kwargs):
         """When creating a TF Object you can supply _values if you want to directly influence the values of the object,
@@ -300,6 +369,38 @@ class TypedObject(NamedObject):
     This allows you to build up configurations using the instances of the objects as a shortcut to writing out all of
     the interpolation syntax.
     """
+
+    @classmethod
+    def add_hook(cls, object_type, hook):
+        """Add a hook for the given object type
+
+        Unlike TFObject.add_hook your hook function will be called with the ID of the typed object and its attributes
+        rather than the full compiled ouput.
+
+        For example::
+
+            Resource.add_hook("aws_instance", my_hook)
+            Resource("aws_instance", "my_instance", instance_type="c5.large")
+
+        Then your my_hook function would be called like::
+
+            my_hook("my_instance", {"instance_type": "c5.large"})
+
+        """
+
+        def typed_hook(output):
+            for output_type in output[cls.TF_TYPE]:
+                if output_type != object_type:
+                    continue
+
+                for object_id in output[cls.TF_TYPE][object_type]:
+                    output[cls.TF_TYPE][object_type][object_id] = hook(
+                        object_id, output[cls.TF_TYPE][object_type][object_id]
+                    )
+
+            return output
+
+        TFObject.add_hook(cls.TF_TYPE, typed_hook)
 
     def __init__(self, _type, _name, **kwargs):
         super(TypedObject, self).__init__(_name, **kwargs)

@@ -350,6 +350,37 @@ To help with this situation a function named ``relative_file`` inside of the ``t
 This would produce a definition that leverages the ``${file(...)}`` interpolation function with a path that reads the ``role_policy.json`` file from the same directory as the Python code that defined the role.
 
 
+Hooks
+=====
+
+Terraformy offers a "hooks" system that allows you to modify objects on the fly at compile
+time.  This can be useful to apply transformations so that users of objects do not need
+to worry about some of the idiosyncratic schema details of Terraform's JSON syntax,
+most notably `"Attributes as Blocks"`_.
+
+The best example of this is the ``aws_security_group`` object type, which requires that its
+``ingress`` and ``egress`` blocks have all of their attributes present, even if they are
+``null``.  To have users have to type out all of the different attributes and set them to
+``None`` is cumbersome, so instead you can use the hook that we ship with this distribution:
+
+.. code-block:: python
+
+    from terraformpy.hooks.aws import install_aws_security_group_attributes_as_blocks_hook
+
+    install_aws_security_group_attributes_as_blocks_hook()
+
+
+Now, users only need to specify the attributes they care about in rules and the hook will
+take care of filling in all of the optional attributes that are mandatory to appear in the
+final compiled JSON.
+
+For more information on how the hooks work see the ``test_hooks_aws.py`` file and the
+inline comments for the ``add_hook`` function on the different object types.
+
+
+.. _"Attributes as Blocks": https://www.terraform.io/docs/configuration/attr-as-blocks.html
+
+
 Notes and Gotchas
 =================
 
