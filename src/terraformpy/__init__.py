@@ -14,7 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from .objects import Data, DuplicateKey, Module, OrderedDict, Output, Provider, Resource, Terraform, TFObject, Variable  # noqa
+from .objects import (
+    Data,
+    DuplicateKey,
+    Module,
+    OrderedDict,
+    Output,
+    Provider,
+    Resource,
+    Terraform,
+    TFObject,
+    Variable,
+)  # noqa
 from .resource_collections import ResourceCollection, Variant  # noqa
 
 # add a couple shortcuts

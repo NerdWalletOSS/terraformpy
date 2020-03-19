@@ -3,6 +3,7 @@
 /docs/_build/
 /dist/
 /venv/
+/.tox/
 # compiled files
 *.o
 *.a

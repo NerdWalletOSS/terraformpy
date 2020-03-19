@@ -1,0 +1,48 @@
+language: python
+sudo: false
+
+branches:
+  only:
+    - master
+
+matrix:
+  fast_finish: true
+  include:
+    - python: 3.7
+      env: TOXENV=black
+
+    - python: 2.7
+      env: TOXENV=py27-codecov
+
+    - python: 3.5
+      env: TOXENV=py35-codecov
+
+    - python: 3.6
+      env: TOXENV=py36-codecov
+
+    - python: 3.7
+      env: TOXENV=py37-codecov
+
+    - python: 3.8
+      env: TOXENV=py38-codecov
+
+    - python: pypy
+      env: TOXENV=pypy2-codecov
+
+    - python: pypy3
+      env: TOXENV=pypy3-codecov
+
+
+install: pip install tox
+script: TOX_SKIP_MISSING_INTERPRETERS="False" tox
+
+deploy:
+  - provider: pypi
+    user: __token__
+    password:
+      secure: "WlN/+BCAFA93yIrDPTUnjR6jVxjYkqBK9/G+PSB0eyZLYTEp2G/rYoYqIg0VsMvsGskN+Z68iJJ4KBwmV88mxihSY5hSZmEyj0cvER1OBXUA25oPi+uJLfUX8gJYfhr3zLVobi1lo/inABr95z92hPjeHaAWV/ggIgj6B5xCWHwSt3/rb5+9bPE1vuhDkX+twZ8lheYQrggX5K/NrfZXWEnxSBIzYNXRAEfIamkQtl5dWedgUTyvEapeaHzSSLM68BUdc8zeuOcKEWud/MAqtoICDNKfU5FtagUUJiN0wEHkC9CzUgTw5Xgb5EnBnl/cCsDc7XHNYbSQpRbaBc3a1PNVukASXsAbt8BNkyp0gYVEeOVRR5MYXbBCgsSnrH0ACFyw8kwUFoyTxUjtpm65MV+OECAy0CDrstrzikxjTdGyxl75dlJbytuaHP1nHDscWUr9ssMsXVGkEAfhj8ag4UyBkN765cdyW+Gyt34/nMkbHWP7xM8H5hGwqXlVi1UDxdT1JFVp9xgiNOhwQ7Hx7bpMEbiHKyNWPlcQ+9IY8ts0J3/0x5W3O1Q+UOSM9iTqTchs2NWSyQqugMdY2lAZuLHvmdV7gGqxrQi0w5wsdX6NiE8RwQXWrsTmIWKlN8Dl1op6+U+4geobDf88VLjF0q5WkBeXwy+iZRQLFRgT1Ko="
+    on:
+      branch: master
+      python: 3.8
+      condition: $TOXENV = py38-codecov
+    distributions: "sdist bdist_wheel"
