@@ -1,3 +1,9 @@
+# 1.2.4
+
+* No functional changes
+  * Adopt black formatting
+  * Move to tox & travis for CI
+
 # 1.2.3
 
 * Fix bug: Multiple providers of different types were colliding with each other
