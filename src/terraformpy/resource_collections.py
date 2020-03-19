@@ -45,12 +45,12 @@ class ResourceCollection(Model):
     """
 
     def __init__(self, *args, **kwargs):
-        variant_name = kwargs.pop('variant_name', None)
+        variant_name = kwargs.pop("variant_name", None)
 
         # if we have positional arguments AND a context then we just want to do the schematics model thing and have
         # super up to the model to let things happen.  this is most likely happening because one resource collection
         # is being used as a reference in a modeltype
-        if len(args) > 0 and kwargs.get('context') is not None:
+        if len(args) > 0 and kwargs.get("context") is not None:
             super(ResourceCollection, self).__init__(*args, **kwargs)
             return
 
@@ -69,16 +69,14 @@ class ResourceCollection(Model):
 
         if variant_name is not None:
             # if there is then try fetching the val from inside the special variant attr
-            variant_key = '{0}_variant'.format(Variant.CURRENT_VARIANT.name)
+            variant_key = "{0}_variant".format(Variant.CURRENT_VARIANT.name)
             variant_data = kwargs.get(variant_key, None)
             if variant_data is not None:
                 kwargs.update(variant_data)
 
         # filter all of the variant data out
         kwargs = dict(
-            (k, v)
-            for k, v in six.iteritems(kwargs)
-            if not k.endswith('_variant')
+            (k, v) for k, v in six.iteritems(kwargs) if not k.endswith("_variant")
         )
 
         super(ResourceCollection, self).__init__(kwargs)
@@ -108,6 +106,7 @@ class Variant(object):
     are shared between many different ResourceCollections at the variant level so you don't need to pass them over and
     over again.
     """
+
     CURRENT_VARIANT = None
 
     def __init__(self, name, **kwargs):
