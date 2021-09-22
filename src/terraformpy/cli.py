@@ -43,7 +43,7 @@ def main():
     # now 'compile' everything that was registered, and write it out the tf.json file
     print("terraformpy - Writing main.tf.json")
     with open("main.tf.json", "w") as fd:
-        json.dump(compile(), fd, indent=4, sort_keys=True)
+        json.dump(compile(), fd, indent=4)
 
     if len(sys.argv) > 1:
         print("terraformpy - Running terraform: %s" % " ".join(sys.argv[1:]))
