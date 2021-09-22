@@ -1,6 +1,6 @@
 # 1.3.1
 
-* Removed the sorting function, as every terraformpy run would sort the duplicate keys
+* When dumping JSON we no longer pass `sort_keys=True`, but rather rely on the stable insertion order of Python 3+ dictionaries
 
 # 1.3.0
 
