@@ -91,7 +91,9 @@ sg = Resource(
     vpc_id=vpc.vpc_id,
     ingress=[ANY_ANY],
     egress=[ANY_ANY],
-    tags=dict(Name="terraformpy-example-sg",),
+    tags=dict(
+        Name="terraformpy-example-sg",
+    ),
 )
 
 Resource("aws_ecs_cluster", "mycluster", name="mycluster")
