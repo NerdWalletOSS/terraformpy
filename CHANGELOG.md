@@ -1,3 +1,7 @@
+# 1.3.2
+
+* Fix build
+
 # 1.3.1
 
 * When dumping JSON we no longer pass `sort_keys=True`, but rather rely on the stable insertion order of Python 3+ dictionaries
