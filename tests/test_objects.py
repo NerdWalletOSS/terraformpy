@@ -80,7 +80,16 @@ def test_compile():
     Variable("var1", default="value")
 
     assert TFObject.compile() == {
-        "resource": {"res1": {"foo": {"attr": "value",}, "bar": {"attr": "other",}},},
+        "resource": {
+            "res1": {
+                "foo": {
+                    "attr": "value",
+                },
+                "bar": {
+                    "attr": "other",
+                },
+            },
+        },
         "variable": {"var1": {"default": "value"}},
     }
 
@@ -114,7 +123,15 @@ def test_tf_type():
 
     TestResource("res1", "foo", attr="value")
 
-    assert TFObject.compile() == {"resource": {"res1": {"foo": {"attr": "value",}}}}
+    assert TFObject.compile() == {
+        "resource": {
+            "res1": {
+                "foo": {
+                    "attr": "value",
+                }
+            }
+        }
+    }
 
 
 def test_access_before_compile():
@@ -251,7 +268,14 @@ def test_terraform_config():
 
 def test_attr_map_access():
     secrets = Data(
-        "aws_kms_secrets", "test", secret=[{"name": "foo", "payload": "bar",},]
+        "aws_kms_secrets",
+        "test",
+        secret=[
+            {
+                "name": "foo",
+                "payload": "bar",
+            },
+        ],
     )
 
     assert secrets.plaintext["foo"] == "${data.aws_kms_secrets.test.plaintext.foo}"
@@ -352,6 +376,13 @@ def test_typed_object_hooks(mocker):
 
     assert compiled == {
         "resource": {
-            "some_type": {"some_id": {"attr": True,}, "other_id": {"attr": True,}}
+            "some_type": {
+                "some_id": {
+                    "attr": True,
+                },
+                "other_id": {
+                    "attr": True,
+                },
+            }
         }
     }

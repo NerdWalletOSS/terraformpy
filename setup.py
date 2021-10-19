@@ -44,11 +44,19 @@ setup(
     package_dir={"": "src"},
     install_requires=["schematics>=2.0,<3.0", "six>=1.11,<2"],
     extras_require={
-        'dev:python_version <= "2.7"': ["pytest>=4.6,<4.7",],
-        'dev:python_version > "3"': ["pytest>=5.0,<6",],
+        'dev:python_version <= "2.7"': [
+            "pytest>=4.6,<4.7",
+        ],
+        'dev:python_version > "3"': [
+            "pytest>=5.0,<6",
+        ],
         "dev": {"pytest-cov", "pytest-mock", "codecov"},
     },
-    entry_points={"console_scripts": ["terraformpy = terraformpy.cli:main",],},
+    entry_points={
+        "console_scripts": [
+            "terraformpy = terraformpy.cli:main",
+        ],
+    },
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
@@ -62,5 +70,7 @@ setup(
         "Topic :: Software Development :: Pre-processors",
         "Topic :: System :: Systems Administration",
     ],
-    cmdclass={"verify": VerifyVersionCommand,},
+    cmdclass={
+        "verify": VerifyVersionCommand,
+    },
 )
