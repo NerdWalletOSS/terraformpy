@@ -1,3 +1,7 @@
+# 1.3.3
+
+* Add new line to the EOF for `main.tf.json`
+
 # 1.3.2
 
 * Fix build
