@@ -44,6 +44,8 @@ def main():
     print("terraformpy - Writing main.tf.json")
     with open("main.tf.json", "w") as fd:
         json.dump(compile(), fd, indent=4)
+        fd.write("\n")
+        
 
     if len(sys.argv) > 1:
         print("terraformpy - Running terraform: %s" % " ".join(sys.argv[1:]))
