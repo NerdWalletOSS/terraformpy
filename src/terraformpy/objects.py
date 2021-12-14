@@ -29,7 +29,7 @@ from .resource_collections import Variant
 def recursive_update(dest, source):
     """Like dict.update, but recursive"""
     for key, val in six.iteritems(source):
-        if isinstance(val, collections.Mapping):
+        if isinstance(val, collections.abc.Mapping):
             recurse = recursive_update(dest.get(key, {}), val)
             dest[key] = recurse
         else:
