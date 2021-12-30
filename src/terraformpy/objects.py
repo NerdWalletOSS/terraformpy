@@ -28,8 +28,13 @@ from .resource_collections import Variant
 
 def recursive_update(dest, source):
     """Like dict.update, but recursive"""
+    try:
+        mapping = collections.abc.Mapping
+    except ImportError:
+        mapping = collections.Mapping
+
     for key, val in six.iteritems(source):
-        if isinstance(val, collections.abc.Mapping):
+        if isinstance(val, mapping):
             recurse = recursive_update(dest.get(key, {}), val)
             dest[key] = recurse
         else:
