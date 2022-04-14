@@ -1,3 +1,6 @@
+# Use a free architecture - see https://docs.travis-ci.com/user/billing-overview/#partner-queue-solution
+arch: arm64
+
 language: python
 sudo: false
 
